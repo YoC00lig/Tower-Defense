@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.effect.DropShadow;
 
@@ -19,9 +20,14 @@ public class Shop {
     HBox box;
     Button btn1, btn2;
     Stage stage;
+    GridPane grid;
+    int row,col;
 
-    public Shop(Stage stage) {
+    public Shop(Stage stage, GridPane gird, int col, int row) {
         this.stage = stage;
+        this.grid = gird;
+        this.col = col;
+        this.row = row;
         try {
             create();
         } catch (FileNotFoundException e) {
@@ -63,7 +69,7 @@ public class Shop {
         BorderPane.setMargin(btn2, new Insets(0,0,40,0));
         BorderPane.setMargin(label2, new Insets(40,0,0,0));
 
-        styleButtons();
+        styleButtons(grid, col, row);
         styleButtonHover(btn1);
         styleButtonHover(btn2);
 
@@ -75,11 +81,35 @@ public class Shop {
         return this.box;
     }
 
-    public void styleButtons() { // todo
+    public void styleButtons(GridPane gridPane, int colIndex, int rowIndex) { // todo
         btn1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            Image image;
+
+            try {
+                image = new Image(new FileInputStream("src/main/resources/tower.png"));
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            ImageView view = new ImageView(image);
+            view.setFitHeight(60);
+            view.setFitWidth(60);
+            gridPane.add(view,colIndex,rowIndex,3,3);
             stage.close();
         });
         btn2.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            Image image;
+
+            try {
+                image = new Image(new FileInputStream("src/main/resources/tower1.png"));
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            ImageView view = new ImageView(image);
+            view.setFitHeight(60);
+            view.setFitWidth(60);
+            gridPane.add(view,colIndex,rowIndex,3,3);
             stage.close();
         });
     }

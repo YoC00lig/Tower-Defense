@@ -119,7 +119,8 @@ public class App extends Application {
             VBox box = new VBox(numberX);
             gridPane.add(box,  i - map1.lowerRight.x + 1, 0);
             gridPane.getColumnConstraints().add(new ColumnConstraints(size));
-            box.setOnMouseClicked(event -> handle());
+            int finalI = i;
+            box.setOnMouseClicked(event -> handle(gridPane, finalI - map1.lowerRight.x + 1, 0 ));
             GridPane.setHalignment(box, HPos.CENTER);
         }
 
@@ -128,7 +129,8 @@ public class App extends Application {
             VBox box = new VBox(numberY);
             gridPane.add(box, 0,map1.upperLeft.y - i + 1);
             gridPane.getRowConstraints().add(new RowConstraints(size));
-            box.setOnMouseClicked(event -> handle());
+            int finalI = i;
+            box.setOnMouseClicked(event -> handle(gridPane, 0,map1.upperLeft.y - finalI + 1));
             GridPane.setHalignment(box, HPos.CENTER);
         }
 
@@ -159,10 +161,10 @@ public class App extends Application {
         stage.show();
     }
 
-    public void handle() {
+    public void handle(GridPane gridPane, int colIndex, int rowIndex) {
         Stage stageShop = new Stage();
         stageShop.setTitle("Shop");
-        Shop shop = new Shop(stageShop);
+        Shop shop = new Shop(stageShop, gridPane, colIndex, rowIndex);
         Scene shopping = new Scene(shop.getVB(), 400, 400);
         stageShop.setResizable(false);
         stageShop.setScene(shopping);
@@ -173,18 +175,7 @@ public class App extends Application {
         pane.setOnMouseClicked(e -> {
             System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
             System.out.printf("Real vector: " + row + " " + col + "%n");
-            Image image;
-
-            try {
-                image = new Image(new FileInputStream("src/main/resources/tower.png"));
-            } catch (FileNotFoundException ex) {
-                throw new RuntimeException(ex);
-            }
-
-            ImageView view = new ImageView(image);
-            view.setFitHeight(60);
-            view.setFitWidth(60);
-            gridPane.add(view,colIndex,rowIndex,3,3);
+            handle(gridPane, colIndex, rowIndex);
         });
         gridPane.add(pane, colIndex, rowIndex);
     }

@@ -11,6 +11,7 @@ public class Castle {
         this.upperLeft = upperLeft;
     }
 
+
     public boolean isDestroyed(){
         if (health <= 0){
             return true;

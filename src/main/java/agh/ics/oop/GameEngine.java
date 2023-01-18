@@ -10,7 +10,6 @@ public class GameEngine {
     private boolean isRunning;
     private int spawnCountdown;
     private int initialSpawnCountdown;
-    private int
 
 
     public void shotFromTowers(){
@@ -87,8 +86,6 @@ public class GameEngine {
         }
 
     }
-
-
 
     public void updateMap(){
         if(this.isRunning){

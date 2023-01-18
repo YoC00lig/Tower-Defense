@@ -18,6 +18,7 @@ public class Castle {
         return false;
     }
 
+
     public int getHealth(){
         return this.health;
     }

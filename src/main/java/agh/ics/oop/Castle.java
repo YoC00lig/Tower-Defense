@@ -13,6 +13,7 @@ public class Castle {
     public boolean isDestroyed(){
         return health <= 0;
     }
+
     public int getHealth(){
         return this.health;
     }

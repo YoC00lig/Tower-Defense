@@ -27,7 +27,7 @@ public class Castle {
     }
 
     public String toString(){
-        return "*";
+        return "c";
     }
 
     public void subtractHealth(int value){

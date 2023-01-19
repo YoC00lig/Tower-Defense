@@ -19,6 +19,7 @@ public class GameMap {
     private int spawnCountdown;
     private int initialSpawnCountdown;
     private int[] waveSizes;
+
     private int waveIndex;
 
 
@@ -34,8 +35,8 @@ public class GameMap {
     }
 
     private void placeCastle() {
-        Vector2d low = new Vector2d((upperLeft.x -10)/2, (upperLeft.y-10)/2);
-        Vector2d high = new Vector2d(low.x +10, low.y+10);
+        Vector2d low = new Vector2d((upperLeft.x - 10) / 2, (upperLeft.y - 10) / 2);
+        Vector2d high = new Vector2d(low.x + 10, low.y + 10);
         this.castle = new Castle(100, low, high);
     }
 
@@ -57,7 +58,7 @@ public class GameMap {
             position = new Vector2d(upper, random.nextInt(upper + 1));
         }
 
-        Enemy enemy = new Enemy(10, 5, position);
+        Enemy enemy = new Enemy(10, 1, position);
         this.listOfEnemies.add(enemy);
         this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
         this.enemies.get(position).add(enemy);
@@ -93,15 +94,15 @@ public class GameMap {
     }
 
     // szukanie najbliższego wroga, do którego strzela wieża w jednum ruchu
-    public Enemy findNearestEnemy(Tower tower){
+    public Enemy findNearestEnemy(Tower tower) {
         Vector2d position = new Vector2d(tower.getUpperLeft().x + 1, tower.getUpperLeft().y - 1);
         int range = tower.getRange();
-        Vector2d nearestPosition = new Vector2d(0,0);
+        Vector2d nearestPosition = new Vector2d(0, 0);
         Enemy nearestEnemy = null;
-        for (Map.Entry<Vector2d, LinkedList<Enemy>> entry : this.enemies.entrySet()){
+        for (Map.Entry<Vector2d, LinkedList<Enemy>> entry : this.enemies.entrySet()) {
             Vector2d currPosition = entry.getKey();
-            double currDist = sqrt(pow(currPosition.x - position.x,2) + pow(currPosition.y - position.y,2));
-            if (currDist < sqrt(pow(nearestPosition.x - position.x,2) + pow(nearestPosition.y - position.y,2)) && currDist < range){
+            double currDist = sqrt(pow(currPosition.x - position.x, 2) + pow(currPosition.y - position.y, 2));
+            if (currDist < sqrt(pow(nearestPosition.x - position.x, 2) + pow(nearestPosition.y - position.y, 2)) && currDist < range) {
                 nearestPosition = currPosition;
                 nearestEnemy = entry.getValue().get(0);
             }
@@ -109,18 +110,15 @@ public class GameMap {
         return nearestEnemy;
     }
 
-    public boolean checkIfIsNearby(Vector2d enemyPosition, Vector2d upperLeft, Vector2d lowerRight){
+    public boolean checkIfIsNearby(Vector2d enemyPosition, Vector2d upperLeft, Vector2d lowerRight) {
         boolean flag = false;
-        if (enemyPosition.x == upperLeft.x-1 && enemyPosition.y <= upperLeft.y && enemyPosition.y >= lowerRight.y){
+        if (enemyPosition.x == upperLeft.x - 1 && enemyPosition.y <= upperLeft.y && enemyPosition.y >= lowerRight.y) {
             flag = true;
-        }
-        else if (enemyPosition.y == upperLeft.y+1 && enemyPosition.x >= upperLeft.x && enemyPosition.x <= lowerRight.x){
+        } else if (enemyPosition.y == upperLeft.y + 1 && enemyPosition.x >= upperLeft.x && enemyPosition.x <= lowerRight.x) {
             flag = true;
-        }
-        else if (enemyPosition.x == lowerRight.x+1 && enemyPosition.y <= upperLeft.y && enemyPosition.y >= lowerRight.y){
+        } else if (enemyPosition.x == lowerRight.x + 1 && enemyPosition.y <= upperLeft.y && enemyPosition.y >= lowerRight.y) {
             flag = true;
-        }
-        else if (enemyPosition.y == lowerRight.y-1 && enemyPosition.y >= upperLeft.y && enemyPosition.y <= lowerRight.y){
+        } else if (enemyPosition.y == lowerRight.y - 1 && enemyPosition.y >= upperLeft.y && enemyPosition.y <= lowerRight.y) {
             flag = true;
         }
 
@@ -128,7 +126,7 @@ public class GameMap {
     }
 
     // szukanie wrogów, którzy stoją przy zamku
-    public ArrayList<Enemy> findAttackingEnemies(){
+    public ArrayList<Enemy> findAttackingEnemies() {
         Vector2d castleUpperLeft = this.castle.getUpperLeft();
         Vector2d castleLowerRight = this.castle.getLowerRight();
         ArrayList<Enemy> attackingEnemies = new ArrayList<>();
@@ -143,7 +141,7 @@ public class GameMap {
     }
 
     // szukanie wrogów, którzy stoją przy wierzy
-    public ArrayList<Enemy> findAttackingEnemiesTower(Tower tower){
+    public ArrayList<Enemy> findAttackingEnemiesTower(Tower tower) {
         Vector2d towerUpperLeft = tower.getUpperLeft();
         Vector2d towerLowerRight = tower.getLowerRight();
         ArrayList<Enemy> attackingEnemiesTower = new ArrayList<>();
@@ -158,21 +156,21 @@ public class GameMap {
     }
 
     // sprawdzanie czy enemy stoi przy zamku
-    public boolean isNextToCastle(Enemy enemy){
+    public boolean isNextToCastle(Enemy enemy) {
         Vector2d castleUpperLeft = this.castle.getUpperLeft();
         Vector2d castleLowerRight = this.castle.getLowerRight();
         Vector2d position = enemy.getPosition();
-        if(checkIfIsNearby(position, castleUpperLeft, castleLowerRight)){
+        if (checkIfIsNearby(position, castleUpperLeft, castleLowerRight)) {
             return true;
         }
         return false;
     }
 
     // sprawdzanie czy enemy stoi przy jakiejś wierzy
-    public boolean isNextToTower(Enemy enemy){
+    public boolean isNextToTower(Enemy enemy) {
         for (Map.Entry<Vector2d, Tower> tower : this.towers.entrySet()) {
             Vector2d towerUpperLeft = tower.getKey();
-            Vector2d towerLowerRight = towerUpperLeft.add(new Vector2d(2,-2));
+            Vector2d towerLowerRight = towerUpperLeft.add(new Vector2d(2, -2));
             Vector2d position = enemy.getPosition();
             if (checkIfIsNearby(position, towerUpperLeft, towerLowerRight)) {
                 return true;
@@ -182,18 +180,20 @@ public class GameMap {
     }
 
     // strzelanie z wież
-    public void shotFromTowers(){
+    public void shotFromTowers() {
         Random random = new Random();
         int value;
-        for(Tower tower: listOfTowers){
+        int strength;
+        for (Tower tower : listOfTowers) {
             Enemy nearestEnemy = findNearestEnemy(tower);
-            value = random.nextInt(5);
+            strength = nearestEnemy.getStrength();
+            value = random.nextInt(5 * strength);
             nearestEnemy.subtractHealth(value);
         }
     }
 
     // usuwanie zabitych wrogów
-    public void deleteDeadEnemies(){
+    public void deleteDeadEnemies() {
         ArrayList<Enemy> tmp = new ArrayList<>();
         for (Enemy enemy : listOfEnemies) {
             if (enemy.getHealth() <= 0) {
@@ -208,7 +208,7 @@ public class GameMap {
     }
 
     // usuwanie zniszczonych wież
-    public void deleteDeadTowers(){
+    public void deleteDeadTowers() {
         ArrayList<Tower> tmp = new ArrayList<>();
         for (Tower tower : listOfTowers) {
             if (tower.getHealth() <= 0) {
@@ -223,44 +223,58 @@ public class GameMap {
     }
 
     // atak na zamek
-    public void attackCastle(){
+    public void attackCastle() {
         ArrayList<Enemy> attackingEnemiesCastle = findAttackingEnemies();
         int size = attackingEnemiesCastle.size();
         Random random = new Random();
         int value;
+        int strength;
+        Enemy enemy;
         Castle castle = this.castle;
-        for(int i = 0; i<size; i++){
-            value = random.nextInt(5);
-            castle.subtractHealth(value);
+        for (int i = 0; i < size; i++) {
+            enemy = attackingEnemiesCastle.get(i);
+            if (!enemy.getMadeHit()) {
+                strength = enemy.getStrength();
+                value = random.nextInt(5 * strength);
+                castle.subtractHealth(value);
+                enemy.changeMadeHit(true);
+            }
+
         }
     }
 
-    // atak na wierzę - trzeba zrobić tak żeby jeden enemy atakował w jednym ruchu tylko zamek lub tylko wieżę jeśli stoi przy obu obiektach
-    public void attackTowers(){
+    // atak na wierzę
+    public void attackTowers() {
         Random random = new Random();
         int value;
+        int strength;
+        Enemy enemy;
         for (Tower tower : listOfTowers) {
             ArrayList<Enemy> attackingEnemiesTower = findAttackingEnemiesTower(tower);
             int size = attackingEnemiesTower.size();
-            for(int i = 0; i<size; i++){
-                value = random.nextInt(5);
-                tower.subtractHealth(value);
+            for (int i = 0; i < size; i++) {
+                enemy = attackingEnemiesTower.get(i);
+                if (!enemy.getMadeHit()) {
+                    strength = enemy.getStrength();
+                    value = random.nextInt(5 * strength);
+                    tower.subtractHealth(value);
+                    enemy.changeMadeHit(true);
+                }
             }
         }
     }
 
-    // ruch wrogów
-    public void enemiesMove(){
-        for (Enemy enemy: listOfEnemies){
-            if(isNextToCastle(enemy) || isNextToTower(enemy)){
-                continue;
-            }
+    // resetuje informacje o tym czy enemy zaatakował wieżę lub zamek
+    public void removeHits() {
+        for (Enemy enemy : listOfEnemies) {
+            enemy.changeMadeHit(false);
         }
     }
+
 
     // fale wrogów
-    public void enemiesWave(){
-        if(this.waveIndex < this.waveSizes.length){  //
+    public void enemiesWave() {
+        if (this.waveIndex < this.waveSizes.length) {  //
             if (this.spawnCountdown <= 0) {
                 for (int i = 0; i < waveSizes[waveIndex]; i++) {
                     placeEnemy();
@@ -328,8 +342,16 @@ public class GameMap {
         return new ArrayList<>();
     }
 
+    // ruch wrogów
+    public void enemiesMove() {
+        for (Enemy enemy : listOfEnemies) {
+            if (isNextToCastle(enemy) || isNextToTower(enemy)) {
+                continue;
+            }
+        }
+    }
 
-    public Castle getCastle(){
+    public Castle getCastle() {
         return this.castle;
     }
 }

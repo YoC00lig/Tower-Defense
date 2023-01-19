@@ -20,14 +20,14 @@ public class GameEngine {
 
     public void updateMap(){
         if(this.isRunning){
-            map.enemiesMove();
-
-            map.attackCastle();
-            map.attackTowers();
-            map.shotFromTowers();
-            map.deleteDeadEnemies();
-            map.deleteDeadTowers();
-            map.enemiesWave();
+            map.enemiesMove();   // ruch wrogów
+            map.attackCastle();  // atak wrogów na zamek
+            map.attackTowers();  // atak wrogów na wieże
+            map.deleteDeadTowers();   // usunięcie zniszczonych wież
+            map.shotFromTowers();     // atak wież na wrogów
+            map.deleteDeadEnemies();  // usunięcie martwych wrogów
+            map.removeHits();    // reset informacji o tym czy wróg zaatakował
+            map.enemiesWave();   // wygenerowanie fali wrogów
         }
     }
 

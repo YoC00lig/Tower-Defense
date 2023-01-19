@@ -11,7 +11,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.effect.DropShadow;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import javafx.stage.Stage;
@@ -70,8 +69,6 @@ public class Shop {
         BorderPane.setMargin(label2, new Insets(40,0,0,0));
 
         styleButtons(grid, col, row);
-        styleButtonHover(btn1);
-        styleButtonHover(btn2);
 
         box = new HBox(pane1, pane2);
         box.setStyle("-fx-background-color: #1f2e2e;");
@@ -81,37 +78,26 @@ public class Shop {
         return this.box;
     }
 
+    public void placeTowerOnMap(String path, GridPane gridPane, int colIndex, int rowIndex) {
+        Image image;
+
+        try {
+            image = new Image(new FileInputStream(path));
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        ImageView view = new ImageView(image);
+        view.setFitHeight(60);
+        view.setFitWidth(60);
+        gridPane.add(view,colIndex,rowIndex,3,3);
+        stage.close();
+    }
     public void styleButtons(GridPane gridPane, int colIndex, int rowIndex) { // todo
-        btn1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            Image image;
-
-            try {
-                image = new Image(new FileInputStream("src/main/resources/tower.png"));
-            } catch (FileNotFoundException ex) {
-                throw new RuntimeException(ex);
-            }
-
-            ImageView view = new ImageView(image);
-            view.setFitHeight(60);
-            view.setFitWidth(60);
-            gridPane.add(view,colIndex,rowIndex,3,3);
-            stage.close();
-        });
-        btn2.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            Image image;
-
-            try {
-                image = new Image(new FileInputStream("src/main/resources/tower1.png"));
-            } catch (FileNotFoundException ex) {
-                throw new RuntimeException(ex);
-            }
-
-            ImageView view = new ImageView(image);
-            view.setFitHeight(60);
-            view.setFitWidth(60);
-            gridPane.add(view,colIndex,rowIndex,3,3);
-            stage.close();
-        });
+        btn1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> placeTowerOnMap("src/main/resources/tower.png", gridPane, colIndex, rowIndex));
+        btn2.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> placeTowerOnMap("src/main/resources/tower1.png", gridPane, colIndex, rowIndex));
+        styleButtonHover(btn1);
+        styleButtonHover(btn2);
     }
 
     public void styleButtonHover(Button B) {

@@ -13,14 +13,16 @@ public class GameMap {
     private final Map<Vector2d, Tower> towers = new HashMap<>();   //(upperLeft, tower)
     public static int size;
     public static final int moveDelay = 300;
+    private int money;
 
-    public GameMap(Vector2d lowerRight, Vector2d upperLeft, int initialNumberOfEnemies) {
+    public GameMap(Vector2d lowerRight, Vector2d upperLeft, int initialNumberOfEnemies, int InitMoney) {
         if ((Math.abs(lowerRight.x - upperLeft.x) <= 10) || (Math.abs(lowerRight.y - upperLeft.y) <= 10)) {
             throw new IllegalArgumentException("Incorrect map coordinates, map must be bigger.");
         }
 
         this.lowerRight = lowerRight;
         this.upperLeft = upperLeft;
+        this.money = InitMoney;
         size = lowerRight.x - upperLeft.x;
         placeCastle();
         for (int i = 0; i < initialNumberOfEnemies; i++) {

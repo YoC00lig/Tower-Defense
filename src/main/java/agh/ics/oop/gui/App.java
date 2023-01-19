@@ -102,7 +102,7 @@ public class App extends Application {
     }
 
     public void drawMap(int mapVariant) throws FileNotFoundException {
-        GameMap map1 = new GameMap(new Vector2d(0,0), new Vector2d(69,39), 6);
+        GameMap map1 = new GameMap(new Vector2d(0,0), new Vector2d(69,39), 6, 300);
         int size = 20;
         gridPane.getChildren().clear();
         gridPane = new GridPane();
@@ -112,7 +112,7 @@ public class App extends Application {
         gridPane.getRowConstraints().add(new RowConstraints(size));
         gridPane.getColumnConstraints().add(new ColumnConstraints(size));
         GridPane.setHalignment(label, HPos.CENTER);
-        gridPane.setGridLinesVisible(true);
+        gridPane.setGridLinesVisible(false);
 
         for (int i = map1.lowerRight.x; i <= map1.upperLeft.x; i++){
             Label numberX = new Label("" + i );

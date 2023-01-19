@@ -30,4 +30,8 @@ public class Tower {
         this.health -= value;
     }
 
+    public String toString(){
+        return "t";
+    }
+
 }

@@ -5,7 +5,7 @@ public class Enemy {
     private int strength;
     private Vector2d position;
 
-    private boolean madeHit;
+    private boolean madeHit; // czy w ruchu juz udeżył
 
 
     public Enemy(int health, int strength, Vector2d position){
@@ -27,7 +27,17 @@ public class Enemy {
         return this.position;
     }
 
+    public int getStrength(){
+        return this.strength;
+    }
+    public boolean getMadeHit(){
+        return this.madeHit;
+    }
     public void changeMadeHit(boolean x){
         this.madeHit = x;
+    }
+
+    public String toString(){
+        return "E";
     }
 }

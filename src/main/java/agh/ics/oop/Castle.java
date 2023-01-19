@@ -10,13 +10,8 @@ public class Castle {
         this.lowerRight = lowerRight;
         this.upperLeft = upperLeft;
     }
-
-
     public boolean isDestroyed(){
-        if (health <= 0){
-            return true;
-        }
-        return false;
+        return health <= 0;
     }
 
     public int getHealth(){

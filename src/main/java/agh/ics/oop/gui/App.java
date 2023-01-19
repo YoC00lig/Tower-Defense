@@ -102,7 +102,7 @@ public class App extends Application {
     }
 
     public void drawMap(int mapVariant) throws FileNotFoundException {
-        GameMap map1 = new GameMap(new Vector2d(0,0), new Vector2d(69,39), 6);
+        GameMap map1 = new GameMap(new Vector2d(0,0), new Vector2d(69,39));
         int size = 20;
         gridPane.getChildren().clear();
         gridPane = new GridPane();

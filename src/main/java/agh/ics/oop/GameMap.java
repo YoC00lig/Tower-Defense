@@ -6,16 +6,16 @@ import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
 public class GameMap {
-    protected final Vector2d lowerRight;
-    protected final Vector2d upperLeft;
+    public final Vector2d lowerRight;
+    public final Vector2d upperLeft;
     private Castle castle;
-    private Map<Vector2d, Enemy> enemies;  //(position, enemy)
-    private Map<Vector2d, Tower> towers;   //(upperLeft, tower)
+    private final Map<Vector2d, Enemy> enemies = new HashMap<>();  //(position, enemy)
+    private final Map<Vector2d, Tower> towers = new HashMap<>();   //(upperLeft, tower)
     public static int size;
     public static final int moveDelay = 300;
 
     public GameMap(Vector2d lowerRight, Vector2d upperLeft, int initialNumberOfEnemies) {
-        if ((lowerRight.x - upperLeft.x <= 10) || (lowerRight.y - upperLeft.y <= 10)) {
+        if ((Math.abs(lowerRight.x - upperLeft.x) <= 10) || (Math.abs(lowerRight.y - upperLeft.y) <= 10)) {
             throw new IllegalArgumentException("Incorrect map coordinates, map must be bigger.");
         }
 
@@ -29,10 +29,9 @@ public class GameMap {
     }
 
     private void placeCastle() {
-        Vector2d start = new Vector2d(this.lowerRight.x - this.upperLeft.x - 10, this.upperLeft.y - this.lowerRight.y - 10);
-        Vector2d end = new Vector2d(start.x + 10, start.y + 10);
-
-        this.castle = new Castle(100, start, end);
+        Vector2d low = new Vector2d((upperLeft.x -10)/2, (upperLeft.y-10)/2);
+        Vector2d high = new Vector2d(low.x +10, low.y+10);
+        this.castle = new Castle(100, low, high);
     }
 
     private void placeEnemy() {
@@ -49,7 +48,7 @@ public class GameMap {
             position = new Vector2d(lower, random.nextInt(upper + 1));
         } else if (side == 2) {  // upper side
             position = new Vector2d(random.nextInt(upper + 1), upper);
-        } else if (side == 3) {  // right side
+        } else {  // right side
             position = new Vector2d(upper, random.nextInt(upper + 1));
         }
 
@@ -156,10 +155,7 @@ public class GameMap {
         Vector2d castleUpperLeft = this.castle.getUpperLeft();
         Vector2d castleLowerRight = this.castle.getLowerRight();
         Vector2d position = enemy.getPosition();
-        if(checkIfIsNearby(position, castleUpperLeft, castleLowerRight)){
-            return true;
-        }
-        return false;
+        return checkIfIsNearby(position, castleUpperLeft, castleLowerRight);
     }
 
     // sprawdzanie czy enemy stoi przy jakiejś wierzy

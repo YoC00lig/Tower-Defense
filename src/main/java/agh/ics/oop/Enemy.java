@@ -12,7 +12,6 @@ public class Enemy {
         this.position = position;
     }
 
-
     public void subtractHealth(int value){
         this.health -= value;
     }

@@ -15,7 +15,6 @@ public class Enemy {
         this.madeHit = false;
     }
 
-
     public void subtractHealth(int value){
         this.health -= value;
     }

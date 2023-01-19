@@ -8,8 +8,8 @@ import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
 public class GameMap {
-    protected final Vector2d lowerRight;
-    protected final Vector2d upperLeft;
+    public final Vector2d lowerRight;
+    public final Vector2d upperLeft;
     private Castle castle;
     public ConcurrentHashMap<Vector2d, LinkedList<Enemy>> enemies = new ConcurrentHashMap<>();  //(position, enemy) zmienić na ConcurrentHashMap
     public ArrayList<Enemy> listOfEnemies;
@@ -23,7 +23,7 @@ public class GameMap {
 
 
     public GameMap(Vector2d lowerRight, Vector2d upperLeft) {
-        if ((lowerRight.x - upperLeft.x <= 10) || (lowerRight.y - upperLeft.y <= 10)) {
+        if ((Math.abs(lowerRight.x - upperLeft.x) <= 10) || (Math.abs(lowerRight.y - upperLeft.y) <= 10)) {
             throw new IllegalArgumentException("Incorrect map coordinates, map must be bigger.");
         }
 
@@ -34,13 +34,12 @@ public class GameMap {
     }
 
     private void placeCastle() {
-        Vector2d start = new Vector2d(this.lowerRight.x - this.upperLeft.x - 10, this.upperLeft.y - this.lowerRight.y - 10);
-        Vector2d end = new Vector2d(start.x + 10, start.y + 10);
-
-        this.castle = new Castle(100, start, end);
+        Vector2d low = new Vector2d((upperLeft.x -10)/2, (upperLeft.y-10)/2);
+        Vector2d high = new Vector2d(low.x +10, low.y+10);
+        this.castle = new Castle(100, low, high);
     }
 
-    public void placeEnemy() {
+    private void placeEnemy() {
         int lower = this.lowerRight.x;
         int upper = this.upperLeft.x;
 
@@ -275,8 +274,6 @@ public class GameMap {
         }
     }
 
-    public void
-
 
     // odtwarzanie ścieżki
     private ArrayList<Vector2d> backtrace(Vector2d start, Vector2d end, Map<Vector2d, Vector2d> parents) {
@@ -330,6 +327,7 @@ public class GameMap {
         }
         return new ArrayList<>();
     }
+
 
     public Castle getCastle(){
         return this.castle;

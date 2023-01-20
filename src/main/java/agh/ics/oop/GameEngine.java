@@ -20,7 +20,7 @@ public class GameEngine {
 
     public void updateMap(){
         if(this.isRunning){
-            map.enemiesMove();   // ruch wrogów
+            map.moveAll();   // ruch wrogów
             map.attackCastle();  // atak wrogów na zamek
             map.attackTowers();  // atak wrogów na wieże
             map.deleteDeadTowers();   // usunięcie zniszczonych wież

@@ -20,10 +20,10 @@ public class GameMap {
     private int initialSpawnCountdown;
     private int[] waveSizes;
 
-    private int waveIndex;
+    private int waveIndex, money;
 
 
-    public GameMap(Vector2d lowerRight, Vector2d upperLeft) {
+    public GameMap(Vector2d lowerRight, Vector2d upperLeft,  int initialNumberOfEnemies, int InitMoney) {
         if ((Math.abs(lowerRight.x - upperLeft.x) <= 10) || (Math.abs(lowerRight.y - upperLeft.y) <= 10)) {
             throw new IllegalArgumentException("Incorrect map coordinates, map must be bigger.");
         }
@@ -31,6 +31,7 @@ public class GameMap {
         this.lowerRight = lowerRight;
         this.upperLeft = upperLeft;
         size = lowerRight.x - upperLeft.x;
+        this.money = InitMoney;
         placeCastle();
     }
 
@@ -58,39 +59,10 @@ public class GameMap {
             position = new Vector2d(upper, random.nextInt(upper + 1));
         }
 
-        Enemy enemy = new Enemy(10, 1, position);
+        Enemy enemy = new Enemy(10, 1, position, this);
         this.listOfEnemies.add(enemy);
         this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
         this.enemies.get(position).add(enemy);
-    }
-
-    public void placeTower(Tower tower) {
-        Vector2d lower = new Vector2d(this.lowerRight.x - 1, this.lowerRight.y + 1);
-        Vector2d upper = new Vector2d(this.upperLeft.x + 1, this.upperLeft.y - 1);
-        Vector2d lowerCastle = this.castle.getLowerRight();
-        Vector2d upperCastle = this.castle.getUpperLeft();
-
-        Vector2d lowerTower = tower.getLowerRight();
-        Vector2d upperTower = tower.getUpperLeft();
-
-        boolean canPlace = true;
-
-        if (!lowerTower.follows(lower) && !upperTower.precedes(upper)) {
-            canPlace = false;
-            throw new IllegalArgumentException("Incorrect tower coordinates, cannot be off the map or on the edges.");
-        }
-        if ((lowerTower.follows(lowerCastle) && lowerTower.precedes(upperCastle)) || (upperTower.follows(lowerCastle) && upperTower.precedes(upperCastle))) {
-            canPlace = false;
-            throw new IllegalArgumentException("Incorrect tower coordinates, cannot overlap a castle square.");
-        }
-    }
-
-    public Object objectAt(Vector2d position) {
-        return towers.get(position);
-    }
-
-    public boolean isOccupied(Vector2d position) {
-        return objectAt(position) != null;
     }
 
     // szukanie najbliższego wroga, do którego strzela wieża w jednum ruchu
@@ -225,14 +197,13 @@ public class GameMap {
     // atak na zamek
     public void attackCastle() {
         ArrayList<Enemy> attackingEnemiesCastle = findAttackingEnemies();
-        int size = attackingEnemiesCastle.size();
         Random random = new Random();
         int value;
         int strength;
         Enemy enemy;
         Castle castle = this.castle;
-        for (int i = 0; i < size; i++) {
-            enemy = attackingEnemiesCastle.get(i);
+        for (Enemy item : attackingEnemiesCastle) {
+            enemy = item;
             if (!enemy.getMadeHit()) {
                 strength = enemy.getStrength();
                 value = random.nextInt(5 * strength);
@@ -251,9 +222,8 @@ public class GameMap {
         Enemy enemy;
         for (Tower tower : listOfTowers) {
             ArrayList<Enemy> attackingEnemiesTower = findAttackingEnemiesTower(tower);
-            int size = attackingEnemiesTower.size();
-            for (int i = 0; i < size; i++) {
-                enemy = attackingEnemiesTower.get(i);
+            for (Enemy item : attackingEnemiesTower) {
+                enemy = item;
                 if (!enemy.getMadeHit()) {
                     strength = enemy.getStrength();
                     value = random.nextInt(5 * strength);
@@ -288,70 +258,54 @@ public class GameMap {
         }
     }
 
-
-    // odtwarzanie ścieżki
-    private ArrayList<Vector2d> backtrace(Vector2d start, Vector2d end, Map<Vector2d, Vector2d> parents) {
-        ArrayList<Vector2d> result = new ArrayList<>();
-        result.add(end);
-        Vector2d prev = parents.get(end);
-        Vector2d new_prev;
-        while (!prev.equals(start)) {
-            result.add(prev);
-            new_prev = parents.get(prev);
-            prev = new_prev;
-        }
-        result.add(start);
-        return result;
-    }
-
-    // wyszukuje najkrótszą ścieżkę z s do destination i zwraca kolejne punkty w formie tablicy ArrayList,
-    // jesli nie istnieje taka ścieżka to zwracana tablica jest pusta.
-    public ArrayList<Vector2d> BFS(Vector2d s, Vector2d destination) {
-        boolean[][] visited = new boolean[size][size];
-        Map<Vector2d, Vector2d> parents = new HashMap<>();
-        LinkedList<Vector2d> queue = new LinkedList<>();
-        visited[s.x][s.y] = true;
-        queue.add(s);
-
-        while (queue.size() != 0) {
-            s = queue.poll();
-            if (s.equals(destination)) return backtrace(s, destination, parents);
-            ArrayList<Vector2d> next_vectors = new ArrayList<>();
-            int x = s.x;
-            int y = s.y;
-            next_vectors.add(new Vector2d(x, y - 1));
-            next_vectors.add(new Vector2d(x, y + 1));
-            next_vectors.add(new Vector2d(x - 1, y));
-            next_vectors.add(new Vector2d(x + 1, y));
-            next_vectors.add(new Vector2d(x - 1, y + 1));
-            next_vectors.add(new Vector2d(x - 1, y - 1));
-            next_vectors.add(new Vector2d(x + 1, y + 1));
-            next_vectors.add(new Vector2d(x + 1, y - 1));
-
-            for (Vector2d next_step : next_vectors) {
-                int nx = next_step.x;
-                int ny = next_step.y;
-
-                if (!visited[nx][ny] && next_step.inBounds(size)) {
-                    visited[nx][ny] = true;
-                    parents.put(next_step, s);
-                    queue.add(next_step);
-                }
-            }
-        }
-        return new ArrayList<>();
-    }
-
-    // ruch wrogów
-    public void enemiesMove() {
-        for (Enemy enemy : listOfEnemies) {
-            if (isNextToCastle(enemy) || isNextToTower(enemy)) {
-                continue;
-            }
-        }
-    }
-
     public Castle getCastle() {
         return this.castle;
+    }
+    // dodawanie wieży
+    public Tower getNewTower(Vector2d upperLeft, int type){
+        Vector2d low = new Vector2d(upperLeft.x, upperLeft.y - 2);
+        Vector2d high = new Vector2d(upperLeft.x + 2, upperLeft.y);
+        Tower tower;
+        if (type == 1) tower = new Tower(100, 1, low, high);
+        else tower = new Tower(100, 2, low, high);
+        return tower;
+    }
+
+    public void addTower(Tower tower) {
+        Vector2d upperLeft_ = tower.getUpperLeft();
+        towers.put(upperLeft_, tower);
+    }
+
+    public boolean checkIfCanPlaceTower(Tower tower) {
+        Vector2d lower = new Vector2d(this.lowerRight.x - 1, this.lowerRight.y + 1);
+        Vector2d upper = new Vector2d(this.upperLeft.x + 1, this.upperLeft.y - 1);
+        Vector2d lowerCastle = this.castle.getLowerRight();
+        Vector2d upperCastle = this.castle.getUpperLeft();
+
+        Vector2d lowerTower = tower.getLowerRight();
+        Vector2d upperTower = tower.getUpperLeft();
+
+        if (!lowerTower.follows(lower) && !upperTower.precedes(upper)) {
+            return false;
+        }
+        return (!lowerTower.follows(lowerCastle) || !lowerTower.precedes(upperCastle)) && (!upperTower.follows(lowerCastle) || !upperTower.precedes(upperCastle));
+    }
+
+    // poruszanie przeciwników - jeden ruch
+    public boolean buildingAt(Vector2d position){
+        for (Tower tower: towers.values()){ // sprawdzanie czy jakaś wieża tam nie stoi
+            Vector2d low = tower.getLowerLeft();
+            Vector2d high = tower.getUpperRight();
+            if (position.x >= low.x && position.x <= high.x && position.y >= low.y && position.y <= high.y) return true;
+        }
+        Vector2d low = castle.getLowerRight(); // sprawdzanie czy tam nie stoi zamek
+        Vector2d high = castle.getUpperLeft();
+        return position.x >= high.x && position.x <= low.x && position.y >= low.y && position.y <= high.y;
+    }
+
+    public void moveAll(){
+        for (LinkedList<Enemy> list: enemies.values()){
+            for (Enemy enemy: list) enemy.move();
+        }
     }
 }

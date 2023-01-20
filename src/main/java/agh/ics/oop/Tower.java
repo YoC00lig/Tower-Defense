@@ -1,16 +1,16 @@
 package agh.ics.oop;
 
 public class Tower {
-    private Vector2d lowerRight;
-    private Vector2d upperLeft;
+    private Vector2d lowerLeft;
+    private Vector2d upperRight;
     private int health;
     private int range;
 
-    public Tower(int health, int range, Vector2d lowerRight, Vector2d upperLeft){
+    public Tower(int health, int range, Vector2d lowerLeft, Vector2d upperRight){
         this.health = health;
         this.range = range;
-        this.lowerRight = lowerRight;
-        this.upperLeft = upperLeft;
+        this.lowerLeft = lowerLeft;
+        this.upperRight = upperRight;
     }
 
     public int getHealth(){
@@ -18,14 +18,21 @@ public class Tower {
     }
 
     public int getRange() { return this.range; }
-    public Vector2d getLowerRight(){
-        return this.lowerRight;
+    public Vector2d getLowerLeft(){
+        return this.lowerLeft;
     }
 
-    public Vector2d getUpperLeft(){
-        return this.upperLeft;
+    public Vector2d getUpperRight(){
+        return this.upperRight;
     }
 
+    public  Vector2d getUpperLeft() {
+        return new Vector2d(this.lowerLeft.x, this.upperRight.y);
+    }
+
+    public  Vector2d getLowerRight() {
+        return new Vector2d(this.upperRight.x, this.lowerLeft.y);
+    }
     public void subtractHealth(int value){
         this.health -= value;
     }

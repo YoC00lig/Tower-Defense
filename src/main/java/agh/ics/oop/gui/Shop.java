@@ -1,5 +1,8 @@
 package agh.ics.oop.gui;
 
+import agh.ics.oop.GameMap;
+import agh.ics.oop.Tower;
+import agh.ics.oop.Vector2d;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -20,13 +23,18 @@ public class Shop {
     Button btn1, btn2;
     Stage stage;
     GridPane grid;
-    int row,col;
+    int rowidx,colidx; // indeksy na gridPane
+    int col, row; // prawdziwe indeksy
+    GameMap map;
 
-    public Shop(Stage stage, GridPane gird, int col, int row) {
+    public Shop(Stage stage, GridPane gird, int colidx, int rowidx, int col, int row, GameMap map) {
         this.stage = stage;
         this.grid = gird;
+        this.colidx = colidx;
+        this.rowidx = rowidx;
         this.col = col;
         this.row = row;
+        this.map = map;
         try {
             create();
         } catch (FileNotFoundException e) {
@@ -35,7 +43,7 @@ public class Shop {
     }
     public void create() throws FileNotFoundException{
         BorderPane pane1 = new BorderPane();
-        Label label1 = new Label("TOWER 1");
+        Label label1 = new Label("$300");
         label1.setStyle("-fx-background-color: #ffd11a;");
         pane1.setTop(label1);
         Image image1 = new Image(new FileInputStream("src/main/resources/tower.png"));
@@ -52,7 +60,7 @@ public class Shop {
         BorderPane.setMargin(label1, new Insets(40,0,0,0));
 
         BorderPane pane2 = new BorderPane();
-        Label label2 = new Label("TOWER 2");
+        Label label2 = new Label("$700");
         label2.setStyle("-fx-background-color: #ffd11a;");
         pane2.setTop(label2);
         Image image2 = new Image(new FileInputStream("src/main/resources/tower1.png"));
@@ -68,19 +76,20 @@ public class Shop {
         BorderPane.setMargin(btn2, new Insets(0,0,40,0));
         BorderPane.setMargin(label2, new Insets(40,0,0,0));
 
-        styleButtons(grid, col, row);
+        styleButtons();
 
         box = new HBox(pane1, pane2);
-        box.setStyle("-fx-background-color: #1f2e2e;");
+        box.setMinHeight(300);
+        box.setMinWidth(400);
+        box.setStyle("-fx-background-image: url('shopbg.jpg');");
     }
 
     public HBox getVB() {
         return this.box;
     }
 
-    public void placeTowerOnMap(String path, GridPane gridPane, int colIndex, int rowIndex) {
+    public void placeTowerOnMap(String path) { // dodaje obrazek wieży na mapę
         Image image;
-
         try {
             image = new Image(new FileInputStream(path));
         } catch (FileNotFoundException ex) {
@@ -90,12 +99,24 @@ public class Shop {
         ImageView view = new ImageView(image);
         view.setFitHeight(60);
         view.setFitWidth(60);
-        gridPane.add(view,colIndex,rowIndex,3,3);
+        this.grid.add(view,this.colidx,this.rowidx,3,3);
         stage.close();
     }
-    public void styleButtons(GridPane gridPane, int colIndex, int rowIndex) { // todo
-        btn1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> placeTowerOnMap("src/main/resources/tower.png", gridPane, colIndex, rowIndex));
-        btn2.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> placeTowerOnMap("src/main/resources/tower1.png", gridPane, colIndex, rowIndex));
+    public void styleButtons() { // Event listenery dla guzików BUY, żeby dodawać wieżę na mapę i do tablicy towers w GameMap
+        btn1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            Tower tower = map.getNewTower(new Vector2d(row, col), 1);
+            if (map.checkIfCanPlaceTower(tower)){
+                placeTowerOnMap("src/main/resources/tower.png");
+                map.addTower(tower);
+            }
+        });
+        btn2.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            Tower tower = map.getNewTower(new Vector2d(row, col), 2);
+            if (map.checkIfCanPlaceTower(tower)){
+                placeTowerOnMap("src/main/resources/tower1.png");
+                map.addTower(tower);
+            }
+        });
         styleButtonHover(btn1);
         styleButtonHover(btn2);
     }

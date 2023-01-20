@@ -9,12 +9,15 @@ public class Enemy {
     private Vector2d position;
     GameMap map;
 
+    private boolean madeHit; // czy w ruchu juz udeżył
+
 
     public Enemy(int health, int strength, Vector2d position, GameMap map){
         this.health = health;
         this.strength = strength;
         this.position = position;
         this.map = map;
+        this.madeHit = false;
     }
 
     public void subtractHealth(int value){
@@ -47,5 +50,19 @@ public class Enemy {
                 this.position = v;
             }
         }
+        
+    public int getStrength(){
+        return this.strength;
+    }
+    public boolean getMadeHit(){
+        return this.madeHit;
+    }
+    public void changeMadeHit(boolean x){
+        this.madeHit = x;
+    }
+
+    public String toString(){
+        return "E";
+
     }
 }

@@ -99,6 +99,7 @@ public class Shop {
         ImageView view = new ImageView(image);
         view.setFitHeight(60);
         view.setFitWidth(60);
+        System.out.println("HERE");
         this.grid.add(view,this.colidx,this.rowidx,3,3);
         stage.close();
     }

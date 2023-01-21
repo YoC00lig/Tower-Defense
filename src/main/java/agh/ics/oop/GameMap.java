@@ -1,6 +1,4 @@
 package agh.ics.oop;
-
-import java.awt.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,13 +10,14 @@ public class GameMap {
     public final Vector2d upperLeft;
     private Castle castle;
     public ConcurrentHashMap<Vector2d, LinkedList<Enemy>> enemies = new ConcurrentHashMap<>();  //(position, enemy) zmienić na ConcurrentHashMap
-    public ArrayList<Enemy> listOfEnemies;
+    public ArrayList<Enemy> listOfEnemies = new ArrayList<>();
     public Map<Vector2d, Tower> towers = new HashMap<>();   //(upperLeft, tower)
-    public ArrayList<Tower> listOfTowers;
+    public ArrayList<Tower> listOfTowers = new ArrayList<>();
     public static int size;
     private int spawnCountdown;
     private int initialSpawnCountdown;
-    private int[] waveSizes;
+    public int startEnemies;
+    private ArrayList<Integer> waveSizes = new ArrayList<>();
 
     private int waveIndex, money;
 
@@ -30,34 +29,35 @@ public class GameMap {
 
         this.lowerRight = lowerRight;
         this.upperLeft = upperLeft;
+        this.startEnemies = initialNumberOfEnemies;
         size = lowerRight.x - upperLeft.x;
+        this.initialSpawnCountdown = 0;
         this.money = InitMoney;
         placeCastle();
     }
 
     private void placeCastle() {
-        Vector2d low = new Vector2d((upperLeft.x - 10) / 2, (upperLeft.y - 10) / 2);
-        Vector2d high = new Vector2d(low.x + 10, low.y + 10);
-        this.castle = new Castle(100, low, high);
+        Vector2d upperLeft_ = new Vector2d((lowerRight.x-10)/2, (upperLeft.y-10)/2);
+        Vector2d upperRight_ = new Vector2d(upperLeft_.x + 9, upperLeft_.y);
+        Vector2d lowerLeft_ = new Vector2d(upperLeft_.x, upperLeft_.y+9);
+        Vector2d lowerRight_ = new Vector2d(lowerLeft_.x+9, lowerLeft_.y);
+        this.castle = new Castle(100,lowerRight_,upperLeft_);
     }
 
-    private void placeEnemy() {
-        int lower = this.lowerRight.x;
-        int upper = this.upperLeft.x;
-
-        Vector2d position = new Vector2d(0, 0);
+    private int getRandomFromRange(int min, int max){
+        Random random = new Random(); // [min,max]
+        return random.nextInt((max - min) + 1) + min;
+    }
+    public void placeEnemy() {
+        Vector2d position;
         Random random = new Random();
         int side = random.nextInt(4);
-
-        if (side == 0) {  //bottom side
-            position = new Vector2d(random.nextInt(upper + 1), lower);
-        } else if (side == 1) {  //left side
-            position = new Vector2d(lower, random.nextInt(upper + 1));
-        } else if (side == 2) {  // upper side
-            position = new Vector2d(random.nextInt(upper + 1), upper);
-        } else if (side == 3) {  // right side
-            position = new Vector2d(upper, random.nextInt(upper + 1));
-        }
+        position = switch (side){
+            case 0 -> new Vector2d(getRandomFromRange(upperLeft.x,lowerRight.x), lowerRight.y); // bottom
+            case 1 -> new Vector2d(upperLeft.x, getRandomFromRange(lowerRight.y,upperLeft.y)); // left
+            case 2 -> new Vector2d(getRandomFromRange(upperLeft.x,lowerRight.x), upperLeft.y); //upper
+            default -> new Vector2d(lowerRight.x, getRandomFromRange(lowerRight.y,upperLeft.y)); // right
+        };
 
         Enemy enemy = new Enemy(10, 1, position, this);
         this.listOfEnemies.add(enemy);
@@ -132,10 +132,7 @@ public class GameMap {
         Vector2d castleUpperLeft = this.castle.getUpperLeft();
         Vector2d castleLowerRight = this.castle.getLowerRight();
         Vector2d position = enemy.getPosition();
-        if (checkIfIsNearby(position, castleUpperLeft, castleLowerRight)) {
-            return true;
-        }
-        return false;
+        return checkIfIsNearby(position, castleUpperLeft, castleLowerRight);
     }
 
     // sprawdzanie czy enemy stoi przy jakiejś wierzy
@@ -220,15 +217,17 @@ public class GameMap {
         int value;
         int strength;
         Enemy enemy;
-        for (Tower tower : listOfTowers) {
-            ArrayList<Enemy> attackingEnemiesTower = findAttackingEnemiesTower(tower);
-            for (Enemy item : attackingEnemiesTower) {
-                enemy = item;
-                if (!enemy.getMadeHit()) {
-                    strength = enemy.getStrength();
-                    value = random.nextInt(5 * strength);
-                    tower.subtractHealth(value);
-                    enemy.changeMadeHit(true);
+        if (listOfTowers.size() > 0){
+            for (Tower tower : listOfTowers) {
+                ArrayList<Enemy> attackingEnemiesTower = findAttackingEnemiesTower(tower);
+                for (Enemy item : attackingEnemiesTower) {
+                    enemy = item;
+                    if (!enemy.getMadeHit()) {
+                        strength = enemy.getStrength();
+                        value = random.nextInt(5 * strength);
+                        tower.subtractHealth(value);
+                        enemy.changeMadeHit(true);
+                    }
                 }
             }
         }
@@ -241,14 +240,11 @@ public class GameMap {
         }
     }
 
-
     // fale wrogów
     public void enemiesWave() {
-        if (this.waveIndex < this.waveSizes.length) {  //
+        if (this.waveIndex < this.waveSizes.size()) {  //
             if (this.spawnCountdown <= 0) {
-                for (int i = 0; i < waveSizes[waveIndex]; i++) {
-                    placeEnemy();
-                }
+                for (int i = 0; i < waveSizes.get(waveIndex); i++) placeEnemy();
                 this.initialSpawnCountdown -= 5;
                 this.spawnCountdown = this.initialSpawnCountdown;
                 this.waveIndex += 1;
@@ -305,7 +301,9 @@ public class GameMap {
 
     public void moveAll(){
         for (LinkedList<Enemy> list: enemies.values()){
-            for (Enemy enemy: list) enemy.move();
+            for (Enemy enemy: list) {
+                if (!isNextToCastle(enemy) && !isNextToTower(enemy)) enemy.move();
+            }
         }
     }
 }

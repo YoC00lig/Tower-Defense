@@ -1,13 +1,13 @@
 package agh.ics.oop;
 import java.util.*;
 
-public class Enemy {
+public class Enemy implements IMapElement{
     private int health;
     GameMap map;
     private int strength;
     private Vector2d position;
 
-    private boolean madeHit; // czy w ruchu juz udeżył
+    private boolean madeHit; // czy w ruchu juz uderzył
 
 
     public Enemy(int health, int strength, Vector2d position, GameMap map){
@@ -43,7 +43,13 @@ public class Enemy {
     public String toString(){
         return "E";
     }
-    public void move() {
+
+    @Override
+    public String getPath(IMapElement object) {
+        return "src/main/resources/archer1.png";
+    }
+
+    public void move() { // prowizoryczne chodzenie dla testowania threadow
         ArrayList<Vector2d> next_vectors = new ArrayList<>();
         int x = this.position.x;
         int y = this.position.y;

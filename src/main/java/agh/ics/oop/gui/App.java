@@ -1,7 +1,6 @@
 package agh.ics.oop.gui;
 
-import agh.ics.oop.Castle;
-import agh.ics.oop.GameMap;
+import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,17 +14,20 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.geometry.HPos;
-import agh.ics.oop.Vector2d;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
+import java.util.*;
+import javafx.application.Platform;
 
 public class App extends Application {
     private GridPane gridPane = new GridPane();
     private final Stage stage = new Stage();
     HBox mainbox;
     GameMap map1;
+    GameEngine engine;
 
     public static void main(String[] args) {
         launch(args);
@@ -102,7 +104,7 @@ public class App extends Application {
         gridPane = new GridPane();
         BorderPane border = new BorderPane();
 
-        Label chooseLabel = new Label("Choose a map");
+        Label chooseLabel = new Label("Choose a map \uD83D\uDDFA");
         chooseLabel.setFont(new Font("Arial", 50));
 
         Button map1 = new Button();
@@ -111,7 +113,9 @@ public class App extends Application {
 
         map1.setOnMouseClicked(event -> {
             try {
-                drawMap(1);
+                drawMap();
+//                Thread thread = new Thread(engine);
+//                thread.start();
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -119,7 +123,9 @@ public class App extends Application {
 
         map2.setOnMouseClicked(event -> {
             try {
-                drawMap(2);
+                drawMap();
+//                Thread thread = new Thread(engine);
+//                thread.start();
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -127,7 +133,9 @@ public class App extends Application {
 
         map3.setOnMouseClicked(event -> {
             try {
-                drawMap(3);
+                drawMap();
+//                Thread thread = new Thread(engine);
+//                thread.start();
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -150,12 +158,16 @@ public class App extends Application {
         stage.show();
     }
 
-    public void drawMap(int mapVariant) throws FileNotFoundException {
-        map1 = new GameMap(new Vector2d(0,0), new Vector2d(69,39), 6, 300);
+    public void drawMap() throws FileNotFoundException {
+        map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 6, 300);
+        engine = new GameEngine(map1, this);
         int size = 20;
         gridPane.getChildren().clear();
         gridPane = new GridPane();
         Label label = new Label("y/x");
+
+        Vector2d low = new Vector2d(map1.upperLeft.x, map1.lowerRight.y);
+        Vector2d high = new Vector2d(map1.lowerRight.x, map1.upperLeft.y);
 
         gridPane.add(label, 0, 0);
         gridPane.getRowConstraints().add(new RowConstraints(size));
@@ -163,29 +175,39 @@ public class App extends Application {
         GridPane.setHalignment(label, HPos.CENTER);
         gridPane.setGridLinesVisible(false);
 
-        for (int i = map1.lowerRight.x; i <= map1.upperLeft.x; i++){
+        for (int i = low.x; i <= high.x; i++){
             Label numberX = new Label("" + i );
             VBox box = new VBox(numberX);
-            gridPane.add(box,  i - map1.lowerRight.x + 1, 0);
+            gridPane.add(box,  i - low.x + 1, 0);
             gridPane.getColumnConstraints().add(new ColumnConstraints(size));
             int finalI = i;
-            box.setOnMouseClicked(event -> handle(gridPane, finalI - map1.lowerRight.x + 1, 0 , finalI, 0));
+            box.setOnMouseClicked(event -> handle(gridPane, finalI - low.x + 1, 0 , finalI, 0));
             GridPane.setHalignment(box, HPos.CENTER);
         }
 
-        for (int i = map1.lowerRight.y; i <= map1.upperLeft.y; i++){
+        for (int i = low.y; i <= high.y; i++){
             Label numberY = new Label("" + i);
             VBox box = new VBox(numberY);
-            gridPane.add(box, 0,map1.upperLeft.y - i + 1);
+            gridPane.add(box, 0,high.y - i + 1);
             gridPane.getRowConstraints().add(new RowConstraints(size));
             int finalI = i;
-            box.setOnMouseClicked(event -> handle(gridPane, 0,map1.upperLeft.y - finalI + 1, 0, finalI));
+            box.setOnMouseClicked(event -> handle(gridPane, 0,high.y - finalI + 1, 0, finalI));
             GridPane.setHalignment(box, HPos.CENTER);
         }
 
-        for (int row = map1.lowerRight.x; row <= map1.upperLeft.x; row++){
-            for (int col = map1.lowerRight.y; col <= map1.upperLeft.y; col++){
-                addPane(row - map1.lowerRight.x + 1, map1.upperLeft.y - col + 1,row,col);
+        for (int row = low.x; row <= high.x; row++){
+            for (int col = low.y; col <= high.y; col++){
+                addPane(row - low.x + 1, high.y - col + 1, row, col);
+            }
+        }
+        for (LinkedList<Enemy> list: map1.enemies.values()){
+            for (Enemy element: list){
+                GuiElementBox guiElement = new GuiElementBox(element, 20);
+                VBox elem = guiElement.getvBox();
+                Vector2d pos = element.getPosition();
+                System.out.println(pos.toString());
+                gridPane.add(elem,  pos.x - low.x + 1, high.y - pos.y + 1);
+                GridPane.setHalignment(elem, HPos.CENTER);
             }
         }
 
@@ -198,11 +220,11 @@ public class App extends Application {
         gridPane.setMaxHeight(800);
         gridPane.setMaxWidth(1400);
         gridPane.setAlignment(Pos.CENTER);
-        gridPane.setStyle("-fx-background-image: url('grassbg.jpg');");
+        gridPane.setStyle("-fx-background-color: #26734d;");
 
         VBox box = new VBox(view);
         box.setAlignment(Pos.CENTER);
-        gridPane.add(box,  castle.getLowerRight().x - map1.lowerRight.x + 1, map1.upperLeft.y - castle.getUpperLeft().y + 1,10,10);
+        gridPane.add(box,  castle.getUpperLeft().x, castle.getUpperLeft().y,10,10);
         mainbox = new HBox(gridPane);
         mainbox.setAlignment(Pos.CENTER);
         mainbox.setStyle("-fx-background-color: #1f2e2e;");
@@ -223,7 +245,11 @@ public class App extends Application {
     }
     private void addPane(int colIndex, int rowIndex, int row, int col) {
         Pane pane = new Pane();
-        pane.setOnMouseClicked(e -> handle(gridPane, colIndex, rowIndex, col, row));
+        pane.setOnMouseClicked(e -> {
+            System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
+            System.out.printf("Real vector: " + row + " " + col + "%n");
+            handle(gridPane, colIndex, rowIndex, col, row);
+        });
         gridPane.add(pane, colIndex, rowIndex);
     }
 
@@ -231,4 +257,20 @@ public class App extends Application {
         B.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> B.setEffect(new DropShadow()));
         B.addEventHandler(MouseEvent.MOUSE_EXITED, e -> B.setEffect(null));
     }
+
+//    public void draw() throws FileNotFoundException {
+//        Platform.runLater(() -> {
+//            try {
+//                drawMap();
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//                throw new RuntimeException(e);
+//            }
+//        });
+//        try {
+//            Thread.sleep(100);
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        }
+//    }
 }

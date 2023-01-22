@@ -22,6 +22,9 @@ public class Enemy implements IMapElement{
         this.map = map;
         this.madeHit = false;
         this.steps = BFS(this.position);
+        for (Vector2d step: steps){
+            System.out.println(step.toString());
+        }
         this.nextMove = 1;
     }
 
@@ -87,7 +90,10 @@ public class Enemy implements IMapElement{
 
         while (queue.size() != 0) {
             p = queue.poll();
-            if (map.isNextToCastle(p)) return backtrace(s, p, parents);
+            if (map.isNextToCastle(p)) {
+                System.out.println("p: " + p.toString());
+                return backtrace(s, p, parents);
+            }
 
             ArrayList<Vector2d> next_vectors = new ArrayList<>();
             int x = p.x;
@@ -100,6 +106,8 @@ public class Enemy implements IMapElement{
             next_vectors.add(new Vector2d(x - 1, y - 1));
             next_vectors.add(new Vector2d(x + 1, y + 1));
             next_vectors.add(new Vector2d(x + 1, y - 1));
+
+            Collections.shuffle(next_vectors);
 
             for (Vector2d next_step : next_vectors) {
                 int nx = next_step.x;
@@ -130,11 +138,11 @@ public class Enemy implements IMapElement{
     }
 
     public void move() {
+        System.out.println(steps.size());
         if (this.nextMove < steps.size()) {
             Vector2d newPosition = steps.get(this.nextMove);
             positionChanged(this.position, newPosition);
             this.position = steps.get(this.nextMove);
-            System.out.println("Move: " + this.nextMove);
             this.nextMove += 1;
         }
 

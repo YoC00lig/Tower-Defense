@@ -36,7 +36,6 @@ public class GameMap  implements  IPositionChangeObserver{
 
     private void placeCastle() {
         Vector2d upperLeft_ = new Vector2d((lowerRight.x-10)/2, (upperLeft.y-10)/2);
-        Vector2d upperRight_ = new Vector2d(upperLeft_.x + 9, upperLeft_.y);
         Vector2d lowerLeft_ = new Vector2d(upperLeft_.x, upperLeft_.y+9);
         Vector2d lowerRight_ = new Vector2d(lowerLeft_.x+9, lowerLeft_.y);
         this.castle = new Castle(500,lowerRight_,upperLeft_);
@@ -81,21 +80,25 @@ public class GameMap  implements  IPositionChangeObserver{
         return nearestEnemy;
     }
 
-    public boolean checkIfIsNearby(Vector2d enemyPosition, Vector2d upperLeft, Vector2d lowerRight) {
-        if (enemyPosition.x == upperLeft.x - 1 && enemyPosition.y <= upperLeft.y && enemyPosition.y >= lowerRight.y) return true;
-        else if (enemyPosition.y == upperLeft.y + 1 && enemyPosition.x >= upperLeft.x && enemyPosition.x <= lowerRight.x) return true;
-        else if (enemyPosition.x == lowerRight.x + 1 && enemyPosition.y <= upperLeft.y && enemyPosition.y >= lowerRight.y) return true;
-        else return enemyPosition.y == lowerRight.y - 1 && enemyPosition.y >= upperLeft.y && enemyPosition.y <= lowerRight.y;
+    public boolean checkIfIsNearbyCastle(Vector2d position){
+        int startX, endX, startY, endY;
+        startX = castle.getUpperLeft().x;
+        endX = castle.getUpperRight().x;
+        startY = castle.getLowerLeft().y;
+        endY = castle.getUpperLeft().y;
+        if (position.x == startX - 1 && position.y <= endY && position.y >= startY) return true;
+        else if (position.x == endX + 1 && position.y <= endY && position.y >= startY) return true;
+        else if (position.y == startY - 1 && position.x >= startX && position.x <= endX) return true;
+        else if (position.y == endY + 1 && position.x >= startX && position.x <= endX) return true;
+        else return false;
     }
 
     // szukanie wrogów, którzy stoją przy zamku
     public ArrayList<Enemy> findAttackingEnemies() {
-        Vector2d castleUpperLeft = this.castle.getUpperLeft();
-        Vector2d castleLowerRight = this.castle.getLowerRight();
         ArrayList<Enemy> attackingEnemies = new ArrayList<>();
         for (Map.Entry<Vector2d, LinkedList<Enemy>> entry : this.enemies.entrySet()) {
             Vector2d position = entry.getKey();
-            boolean flag = checkIfIsNearby(position, castleUpperLeft, castleLowerRight);
+            boolean flag = checkIfIsNearbyCastle(position);
             if (flag) {
                 attackingEnemies.addAll(entry.getValue());
             }
@@ -105,12 +108,10 @@ public class GameMap  implements  IPositionChangeObserver{
 
     // szukanie wrogów, którzy stoją przy wierzy
     public ArrayList<Enemy> findAttackingEnemiesTower(Tower tower) {
-        Vector2d towerUpperLeft = tower.getUpperLeft();
-        Vector2d towerLowerRight = tower.getLowerRight();
         ArrayList<Enemy> attackingEnemiesTower = new ArrayList<>();
         for (Map.Entry<Vector2d, LinkedList<Enemy>> entry : this.enemies.entrySet()) {
             Vector2d position = entry.getKey();
-            boolean flag = checkIfIsNearby(position, towerUpperLeft, towerLowerRight);
+            boolean flag = checkIfIsNearbyCastle(position);
             if (flag) {
                 attackingEnemiesTower.addAll(entry.getValue());
             }
@@ -120,19 +121,13 @@ public class GameMap  implements  IPositionChangeObserver{
 
     // sprawdzanie czy enemy stoi przy zamku
     public boolean isNextToCastle(Vector2d position) {
-        Vector2d castleUpperLeft = this.castle.getUpperLeft();
-        Vector2d castleLowerRight = this.castle.getLowerRight();
-        return checkIfIsNearby(position, castleUpperLeft, castleLowerRight);
+        return checkIfIsNearbyCastle(position);
     }
 
     // sprawdzanie czy enemy stoi przy jakiejś wierzy
     public boolean isNextToTower(Vector2d position) {
-        for (Map.Entry<Vector2d, Tower> tower : this.towers.entrySet()) {
-            Vector2d towerUpperLeft = tower.getKey();
-            Vector2d towerLowerRight = towerUpperLeft.add(new Vector2d(2, -2));
-            if (checkIfIsNearby(position, towerUpperLeft, towerLowerRight)) {
-                return true;
-            }
+        for (Tower tower: this.listOfTowers) {
+            if (tower.isNextTo(position)) return true;
         }
         return false;
     }

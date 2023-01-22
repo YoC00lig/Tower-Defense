@@ -114,7 +114,7 @@ public class App extends Application {
         Button m3 = new Button();
 
         m1.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 2, 300);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 5, 300);
             engine = new GameEngine(this.map1, this);
             Thread thread = new Thread(engine);
             thread.start();
@@ -232,7 +232,6 @@ public class App extends Application {
         view.setFitHeight(200);
 
         double progress = castle.getHealth() / castle.maxHealth;
-        System.out.println(progress);
         ProgressBar castleHB = new ProgressBar(Math.min(1.00, progress));
         if (progress > 0.8) castleHB.setStyle("-fx-accent: green;");
         else if (progress >= 0.6 && progress < 0.8) castleHB.setStyle("-fx-accent: #ccff33;");

@@ -6,12 +6,14 @@ public class Tower {
     private int health;
     private int range;
     public int type;
+    public double maxHealth;
 
     public Tower(int health, int range, Vector2d lowerLeft, Vector2d upperRight, int type){
         this.health = health;
         this.range = range;
         this.lowerLeft = lowerLeft;
         this.upperRight = upperRight;
+        this.maxHealth = health;
         this.type = type;
     }
 

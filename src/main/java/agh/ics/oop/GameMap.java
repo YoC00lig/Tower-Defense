@@ -39,7 +39,7 @@ public class GameMap  implements  IPositionChangeObserver{
         Vector2d upperRight_ = new Vector2d(upperLeft_.x + 9, upperLeft_.y);
         Vector2d lowerLeft_ = new Vector2d(upperLeft_.x, upperLeft_.y+9);
         Vector2d lowerRight_ = new Vector2d(lowerLeft_.x+9, lowerLeft_.y);
-        this.castle = new Castle(100,lowerRight_,upperLeft_);
+        this.castle = new Castle(500,lowerRight_,upperLeft_);
     }
 
     private int getRandomFromRange(int min, int max){
@@ -126,11 +126,10 @@ public class GameMap  implements  IPositionChangeObserver{
     }
 
     // sprawdzanie czy enemy stoi przy jakiejś wierzy
-    public boolean isNextToTower(Enemy enemy) {
+    public boolean isNextToTower(Vector2d position) {
         for (Map.Entry<Vector2d, Tower> tower : this.towers.entrySet()) {
             Vector2d towerUpperLeft = tower.getKey();
             Vector2d towerLowerRight = towerUpperLeft.add(new Vector2d(2, -2));
-            Vector2d position = enemy.getPosition();
             if (checkIfIsNearby(position, towerUpperLeft, towerLowerRight)) {
                 return true;
             }
@@ -284,17 +283,17 @@ public class GameMap  implements  IPositionChangeObserver{
 
     @Override
     public void positionChanged(Vector2d oldPos, Vector2d newPos, Enemy enemy) {
-        LinkedList<Enemy> animalsOldPlace = this.enemies.get(oldPos);
+        LinkedList<Enemy> OldPlace = this.enemies.get(oldPos);
         this.enemies.computeIfAbsent(newPos, k -> new LinkedList<>());
-        LinkedList<Enemy> animalsNewPlace = this.enemies.get(newPos);
-        animalsOldPlace.remove(enemy);
-        animalsNewPlace.add(enemy);
+        LinkedList<Enemy> NewPlace = this.enemies.get(newPos);
+        OldPlace.remove(enemy);
+        NewPlace.add(enemy);
     }
 
     public void moveAll(){
         for (LinkedList<Enemy> list: enemies.values()){
             for (Enemy enemy: list) {
-                if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy)) enemy.move();
+                if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition())) enemy.move();
             }
         }
     }

@@ -9,11 +9,10 @@ public class Enemy implements IMapElement{
     protected List<IPositionChangeObserver> observers = new ArrayList<>();
 
     private boolean madeHit; // czy w ruchu juz uderzył
-    ArrayList<Vector2d> steps = new ArrayList<>();
-    private boolean pathExists;
+    ArrayList<Vector2d> steps;
+
     private int nextMove;
-    private static final int[] row = { -1, 0, 0, 1 };
-    private static final int[] col = { 0, -1, 1, 0 };
+
 
 
     public Enemy(int health, int strength, Vector2d position, GameMap map){
@@ -106,7 +105,7 @@ public class Enemy implements IMapElement{
                 int nx = next_step.x;
                 int ny = next_step.y;
 
-                if (isValid(next_step,map) && !visited[nx][ny]) {
+                if (isValid(next_step, map) && !visited[nx][ny]) {
                     visited[nx][ny] = true;
                     parents.put(next_step, p);
                     queue.add(next_step);
@@ -135,6 +134,7 @@ public class Enemy implements IMapElement{
             Vector2d newPosition = steps.get(this.nextMove);
             positionChanged(this.position, newPosition);
             this.position = steps.get(this.nextMove);
+            System.out.println("Move: " + this.nextMove);
             this.nextMove += 1;
         }
 

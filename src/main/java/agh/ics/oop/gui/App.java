@@ -4,6 +4,7 @@ import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -14,7 +15,6 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.geometry.HPos;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import javafx.scene.layout.VBox;
@@ -99,7 +99,6 @@ public class App extends Application {
         stage.setTitle("Tower defence");
         stage.setOnCloseRequest(event -> System.exit(0));
         stage.show();
-
     }
 
     public void mapChoice() throws FileNotFoundException {
@@ -115,7 +114,7 @@ public class App extends Application {
         Button m3 = new Button();
 
         m1.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 6, 300);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 2, 300);
             engine = new GameEngine(this.map1, this);
             Thread thread = new Thread(engine);
             thread.start();
@@ -207,9 +206,22 @@ public class App extends Application {
             }
 
             ImageView view = new ImageView(image);
-            view.setFitHeight(60);
+            view.setFitHeight(50);
             view.setFitWidth(60);
-            gridPane.add(view,colidx,rowidx,3,3);
+
+            double progress = tower.getHealth() / tower.maxHealth;
+            ProgressBar HB = new ProgressBar(Math.min(1.00, progress));
+            if (progress > 0.8) HB.setStyle("-fx-accent: green;");
+            else if (progress >= 0.6 && progress < 0.8) HB.setStyle("-fx-accent: #ccff33;");
+            else if (progress >= 0.4 && progress < 0.6) HB.setStyle("-fx-accent: #ffff1a;");
+            else if (progress >= 0.2 && progress < 0.4) HB.setStyle("-fx-accent: #ff9900;");
+            else HB.setStyle("-fx-accent: red;");
+            HB.setPrefHeight(10);
+            HB.setMinHeight(10);
+            HB.setMinWidth(30);
+
+            VBox box = new VBox(HB, view);
+            gridPane.add(box,colidx,rowidx,3,3);
             GridPane.setHalignment(view, HPos.CENTER);
         }
 
@@ -217,14 +229,26 @@ public class App extends Application {
         ImageView view = new ImageView(image);
         Castle castle = map1.getCastle();
         view.setFitWidth(220);
-        view.setFitHeight(220);
+        view.setFitHeight(200);
+
+        double progress = castle.getHealth() / castle.maxHealth;
+        System.out.println(progress);
+        ProgressBar castleHB = new ProgressBar(Math.min(1.00, progress));
+        if (progress > 0.8) castleHB.setStyle("-fx-accent: green;");
+        else if (progress >= 0.6 && progress < 0.8) castleHB.setStyle("-fx-accent: #ccff33;");
+        else if (progress >= 0.4 && progress < 0.6) castleHB.setStyle("-fx-accent: #ffff1a;");
+        else if (progress >= 0.2 && progress < 0.4) castleHB.setStyle("-fx-accent: #ff9900;");
+        else castleHB.setStyle("-fx-accent: red;");
+        castleHB.setPrefHeight(20);
+        castleHB.setMinHeight(20);
+        castleHB.setMinWidth(180);
 
         gridPane.setMaxHeight(800);
         gridPane.setMaxWidth(1400);
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setStyle("-fx-background-color: #26734d;");
 
-        VBox box = new VBox(view);
+        VBox box = new VBox(castleHB, view);
         box.setAlignment(Pos.CENTER);
         gridPane.add(box,  castle.getUpperLeft().x, castle.getUpperLeft().y,10,10);
         mainbox = new HBox(gridPane);
@@ -269,7 +293,6 @@ public class App extends Application {
                 throw new RuntimeException(e);
             }
         });
-
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {

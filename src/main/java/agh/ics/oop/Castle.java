@@ -2,11 +2,13 @@ package agh.ics.oop;
 
 public class Castle {
     private int health;
+    public double maxHealth;
     private Vector2d lowerRight, lowerLeft;
     private Vector2d upperLeft, upperRight;
 
     public Castle(int health, Vector2d lowerRight, Vector2d upperLeft){
         this.health = health;
+        this.maxHealth = health;
         this.lowerRight = lowerRight;
         this.upperLeft = upperLeft;
         this.lowerLeft = new Vector2d(upperLeft.x, lowerRight.y);

@@ -63,7 +63,7 @@ public class Enemy implements IMapElement{
         next_vectors.add(new Vector2d(x + 1, y - 1));
         Collections.shuffle(next_vectors);
         for (Vector2d v : next_vectors) {
-            if (!map.buildingAt(v)) {
+            if (!map.buildingAt(v) && v.x >= map.upperLeft.x && v.x <= map.lowerRight.x && v.y >= map.lowerRight.y && v.y <= map.upperLeft.y) {
                 this.position = v;
             }
         }

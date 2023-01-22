@@ -112,33 +112,16 @@ public class App extends Application {
         Button map3 = new Button();
 
         map1.setOnMouseClicked(event -> {
-            try {
-                drawMap();
-//                Thread thread = new Thread(engine);
-//                thread.start();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 6, 300);
+            engine = new GameEngine(this.map1, this);
+            Thread thread = new Thread(engine);
+            thread.start();
         });
 
         map2.setOnMouseClicked(event -> {
-            try {
-                drawMap();
-//                Thread thread = new Thread(engine);
-//                thread.start();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
         });
 
         map3.setOnMouseClicked(event -> {
-            try {
-                drawMap();
-//                Thread thread = new Thread(engine);
-//                thread.start();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
         });
 
         HBox hBox = new HBox(40, map1, map2, map3);
@@ -159,8 +142,6 @@ public class App extends Application {
     }
 
     public void drawMap() throws FileNotFoundException {
-        map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 6, 300);
-        engine = new GameEngine(map1, this);
         int size = 20;
         gridPane.getChildren().clear();
         gridPane = new GridPane();
@@ -180,9 +161,9 @@ public class App extends Application {
             VBox box = new VBox(numberX);
             gridPane.add(box,  i - low.x + 1, 0);
             gridPane.getColumnConstraints().add(new ColumnConstraints(size));
+            GridPane.setHalignment(box, HPos.CENTER);
             int finalI = i;
             box.setOnMouseClicked(event -> handle(gridPane, finalI - low.x + 1, 0 , finalI, 0));
-            GridPane.setHalignment(box, HPos.CENTER);
         }
 
         for (int i = low.y; i <= high.y; i++){
@@ -190,9 +171,9 @@ public class App extends Application {
             VBox box = new VBox(numberY);
             gridPane.add(box, 0,high.y - i + 1);
             gridPane.getRowConstraints().add(new RowConstraints(size));
+            GridPane.setHalignment(box, HPos.CENTER);
             int finalI = i;
             box.setOnMouseClicked(event -> handle(gridPane, 0,high.y - finalI + 1, 0, finalI));
-            GridPane.setHalignment(box, HPos.CENTER);
         }
 
         for (int row = low.x; row <= high.x; row++){
@@ -205,7 +186,6 @@ public class App extends Application {
                 GuiElementBox guiElement = new GuiElementBox(element, 20);
                 VBox elem = guiElement.getvBox();
                 Vector2d pos = element.getPosition();
-                System.out.println(pos.toString());
                 gridPane.add(elem,  pos.x - low.x + 1, high.y - pos.y + 1);
                 GridPane.setHalignment(elem, HPos.CENTER);
             }
@@ -246,8 +226,6 @@ public class App extends Application {
     private void addPane(int colIndex, int rowIndex, int row, int col) {
         Pane pane = new Pane();
         pane.setOnMouseClicked(e -> {
-            System.out.printf("Mouse clicked cell [%d, %d]%n", colIndex, rowIndex);
-            System.out.printf("Real vector: " + row + " " + col + "%n");
             handle(gridPane, colIndex, rowIndex, col, row);
         });
         gridPane.add(pane, colIndex, rowIndex);
@@ -258,19 +236,19 @@ public class App extends Application {
         B.addEventHandler(MouseEvent.MOUSE_EXITED, e -> B.setEffect(null));
     }
 
-//    public void draw() throws FileNotFoundException {
-//        Platform.runLater(() -> {
-//            try {
-//                drawMap();
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//                throw new RuntimeException(e);
-//            }
-//        });
-//        try {
-//            Thread.sleep(100);
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//        }
-//    }
+    public void draw() throws FileNotFoundException {
+        Platform.runLater(() -> {
+            try {
+                drawMap();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        });
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 }

@@ -271,20 +271,10 @@ public class GameMap {
         Vector2d upperLeft_ = tower.getUpperLeft();
         towers.put(upperLeft_, tower);
     }
-
     public boolean checkIfCanPlaceTower(Tower tower) {
-        Vector2d lower = new Vector2d(this.lowerRight.x - 1, this.lowerRight.y + 1);
-        Vector2d upper = new Vector2d(this.upperLeft.x + 1, this.upperLeft.y - 1);
-        Vector2d lowerCastle = this.castle.getLowerRight();
-        Vector2d upperCastle = this.castle.getUpperLeft();
-
-        Vector2d lowerTower = tower.getLowerRight();
-        Vector2d upperTower = tower.getUpperLeft();
-
-        if (!lowerTower.follows(lower) && !upperTower.precedes(upper)) {
-            return false;
-        }
-        return (!lowerTower.follows(lowerCastle) || !lowerTower.precedes(upperCastle)) && (!upperTower.follows(lowerCastle) || !upperTower.precedes(upperCastle));
+        boolean left = !buildingAt(tower.getUpperLeft()) && !buildingAt(tower.getLowerLeft());
+        boolean right = !buildingAt(tower.getUpperRight()) && !buildingAt(tower.getLowerRight());
+        return left && right;
     }
 
     // poruszanie przeciwników - jeden ruch

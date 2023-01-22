@@ -4,7 +4,7 @@ import agh.ics.oop.gui.App;
 import java.io.FileNotFoundException;
 
 
-public class GameEngine {
+public class GameEngine implements Runnable, IEngine{
     private GameMap map;
     private boolean isRunning;
     public final int moveDelay = 300;
@@ -33,24 +33,24 @@ public class GameEngine {
         }
     }
 
-//    @Override
-//    public void run() {
-//        while (map.getCastle().getHealth() >= 0) {
-//            updateMap();
-//            try {
-//                app.draw();
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//                throw new RuntimeException(e);
-//            }
-//            try {
-//                Thread.sleep(this.moveDelay);
-//            } catch (InterruptedException e) {
-//                break;
-//            }
-//        }
-//        Thread.interrupted();
-//    }
+    @Override
+    public void run() {
+        while (map.getCastle().getHealth() >= 0) {
+            updateMap();
+            try {
+                app.draw();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+            try {
+                Thread.sleep(this.moveDelay);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+        Thread.interrupted();
+    }
 
 }
 

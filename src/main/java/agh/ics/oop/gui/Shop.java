@@ -99,7 +99,6 @@ public class Shop {
         ImageView view = new ImageView(image);
         view.setFitHeight(60);
         view.setFitWidth(60);
-        System.out.println("HERE");
         this.grid.add(view,this.colidx,this.rowidx,3,3);
         stage.close();
     }
@@ -110,6 +109,7 @@ public class Shop {
                 placeTowerOnMap("src/main/resources/tower.png");
                 map.addTower(tower);
             }
+            stage.close();
         });
         btn2.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             Tower tower = map.getNewTower(new Vector2d(row, col), 2);
@@ -117,6 +117,7 @@ public class Shop {
                 placeTowerOnMap("src/main/resources/tower1.png");
                 map.addTower(tower);
             }
+            stage.close();
         });
         styleButtonHover(btn1);
         styleButtonHover(btn2);

@@ -16,7 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.effect.DropShadow;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import javafx.stage.Stage;
+import javafx.stage.*;
 
 public class Shop {
     HBox box;
@@ -26,8 +26,9 @@ public class Shop {
     int rowidx,colidx; // indeksy na gridPane
     int col, row; // prawdziwe indeksy
     GameMap map;
+    BorderPane pane1, pane2;
 
-    public Shop(Stage stage, GridPane gird, int colidx, int rowidx, int col, int row, GameMap map) {
+    public Shop(Stage stage, GridPane gird, int colidx, int rowidx, int col, int row, GameMap map, Stage primaryStage) {
         this.stage = stage;
         this.grid = gird;
         this.colidx = colidx;
@@ -36,6 +37,11 @@ public class Shop {
         this.row = row;
         this.map = map;
         this.stage.setAlwaysOnTop(true);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(primaryStage);
+        stage.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused) stage.hide();
+        });
         try {
             create();
         } catch (FileNotFoundException e) {
@@ -43,7 +49,7 @@ public class Shop {
         }
     }
     public void create() throws FileNotFoundException{
-        BorderPane pane1 = new BorderPane();
+        pane1 = new BorderPane();
         Label label1 = new Label("$300");
         label1.setStyle("-fx-background-color: #ffd11a;");
         pane1.setTop(label1);
@@ -60,7 +66,7 @@ public class Shop {
         BorderPane.setMargin(btn1, new Insets(0,0,40,0));
         BorderPane.setMargin(label1, new Insets(40,0,0,0));
 
-        BorderPane pane2 = new BorderPane();
+        pane2 = new BorderPane();
         Label label2 = new Label("$700");
         label2.setStyle("-fx-background-color: #ffd11a;");
         pane2.setTop(label2);
@@ -106,19 +112,33 @@ public class Shop {
     public void styleButtons() { // Event listenery dla guzików BUY, żeby dodawać wieżę na mapę i do tablicy towers w GameMap
         btn1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             Tower tower = map.getNewTower(new Vector2d(row, col), 1);
-            if (map.checkIfCanPlaceTower(tower)){
+            if (map.checkIfCanPlaceTower(tower) && map.money - tower.getPrice() >= 0){
                 placeTowerOnMap("src/main/resources/tower.png");
+                map.money -= tower.getPrice();
                 map.addTower(tower);
+                stage.close();
+            } else if (map.money - tower.getPrice() < 0) {
+                Label label = new Label("NOT ENOUGH MONEY");
+                label.setStyle("-fx-background-color: #ff4d4d;");
+                BorderPane.setAlignment(label, Pos.CENTER);
+                BorderPane.setMargin(label, new Insets(40,0,0,0));
+                pane1.setTop(label);
             }
-            stage.close();
         });
         btn2.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             Tower tower = map.getNewTower(new Vector2d(row, col), 2);
-            if (map.checkIfCanPlaceTower(tower)){
+            if (map.checkIfCanPlaceTower(tower) && map.money - tower.getPrice() >= 0){
                 placeTowerOnMap("src/main/resources/tower1.png");
+                map.money -= tower.getPrice();
                 map.addTower(tower);
+                stage.close();
+            } else if (map.money - tower.getPrice() < 0) {
+                Label label = new Label("NOT ENOUGH MONEY");
+                label.setStyle("-fx-background-color: #ff4d4d;");
+                BorderPane.setAlignment(label, Pos.CENTER);
+                BorderPane.setMargin(label, new Insets(40,0,0,0));
+                pane2.setTop(label);
             }
-            stage.close();
         });
         styleButtonHover(btn1);
         styleButtonHover(btn2);

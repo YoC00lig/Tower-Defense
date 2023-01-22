@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
-public class GameMap {
+public class GameMap  implements  IPositionChangeObserver{
     public final Vector2d lowerRight;
     public final Vector2d upperLeft;
     private Castle castle;
@@ -16,17 +16,15 @@ public class GameMap {
     public static int size;
     private int spawnCountdown;
     private int initialSpawnCountdown;
-    public int startEnemies;
+    public int startEnemies, money;
     private ArrayList<Integer> waveSizes = new ArrayList<>();
-
-    private int waveIndex, money;
+    private int waveIndex;
 
 
     public GameMap(Vector2d lowerRight, Vector2d upperLeft,  int initialNumberOfEnemies, int InitMoney) {
         if ((Math.abs(lowerRight.x - upperLeft.x) <= 10) || (Math.abs(lowerRight.y - upperLeft.y) <= 10)) {
             throw new IllegalArgumentException("Incorrect map coordinates, map must be bigger.");
         }
-
         this.lowerRight = lowerRight;
         this.upperLeft = upperLeft;
         this.startEnemies = initialNumberOfEnemies;
@@ -63,6 +61,7 @@ public class GameMap {
         this.listOfEnemies.add(enemy);
         this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
         this.enemies.get(position).add(enemy);
+        enemy.addObserver(this);
     }
 
     // szukanie najbliższego wroga, do którego strzela wieża w jednum ruchu
@@ -83,18 +82,10 @@ public class GameMap {
     }
 
     public boolean checkIfIsNearby(Vector2d enemyPosition, Vector2d upperLeft, Vector2d lowerRight) {
-        boolean flag = false;
-        if (enemyPosition.x == upperLeft.x - 1 && enemyPosition.y <= upperLeft.y && enemyPosition.y >= lowerRight.y) {
-            flag = true;
-        } else if (enemyPosition.y == upperLeft.y + 1 && enemyPosition.x >= upperLeft.x && enemyPosition.x <= lowerRight.x) {
-            flag = true;
-        } else if (enemyPosition.x == lowerRight.x + 1 && enemyPosition.y <= upperLeft.y && enemyPosition.y >= lowerRight.y) {
-            flag = true;
-        } else if (enemyPosition.y == lowerRight.y - 1 && enemyPosition.y >= upperLeft.y && enemyPosition.y <= lowerRight.y) {
-            flag = true;
-        }
-
-        return flag;
+        if (enemyPosition.x == upperLeft.x - 1 && enemyPosition.y <= upperLeft.y && enemyPosition.y >= lowerRight.y) return true;
+        else if (enemyPosition.y == upperLeft.y + 1 && enemyPosition.x >= upperLeft.x && enemyPosition.x <= lowerRight.x) return true;
+        else if (enemyPosition.x == lowerRight.x + 1 && enemyPosition.y <= upperLeft.y && enemyPosition.y >= lowerRight.y) return true;
+        else return enemyPosition.y == lowerRight.y - 1 && enemyPosition.y >= upperLeft.y && enemyPosition.y <= lowerRight.y;
     }
 
     // szukanie wrogów, którzy stoją przy zamku
@@ -128,10 +119,9 @@ public class GameMap {
     }
 
     // sprawdzanie czy enemy stoi przy zamku
-    public boolean isNextToCastle(Enemy enemy) {
+    public boolean isNextToCastle(Vector2d position) {
         Vector2d castleUpperLeft = this.castle.getUpperLeft();
         Vector2d castleLowerRight = this.castle.getLowerRight();
-        Vector2d position = enemy.getPosition();
         return checkIfIsNearby(position, castleUpperLeft, castleLowerRight);
     }
 
@@ -282,7 +272,7 @@ public class GameMap {
 
     // poruszanie przeciwników - jeden ruch
     public boolean buildingAt(Vector2d position){
-        for (Tower tower: towers.values()){ // sprawdzanie czy jakaś wieża tam nie stoi
+        for (Tower tower: towers.values()) { // sprawdzanie czy jakaś wieża tam nie stoi
             Vector2d low = tower.getLowerLeft();
             Vector2d high = tower.getUpperRight();
             if (position.x >= low.x && position.x <= high.x && position.y >= low.y && position.y <= high.y) return true;
@@ -292,10 +282,19 @@ public class GameMap {
         return position.x >= high.x && position.x <= low.x && position.y >= low.y && position.y <= high.y;
     }
 
+    @Override
+    public void positionChanged(Vector2d oldPos, Vector2d newPos, Enemy enemy) {
+        LinkedList<Enemy> animalsOldPlace = this.enemies.get(oldPos);
+        this.enemies.computeIfAbsent(newPos, k -> new LinkedList<>());
+        LinkedList<Enemy> animalsNewPlace = this.enemies.get(newPos);
+        animalsOldPlace.remove(enemy);
+        animalsNewPlace.add(enemy);
+    }
+
     public void moveAll(){
         for (LinkedList<Enemy> list: enemies.values()){
             for (Enemy enemy: list) {
-                if (!isNextToCastle(enemy) && !isNextToTower(enemy)) enemy.move();
+                if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy)) enemy.move();
             }
         }
     }

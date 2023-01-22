@@ -43,6 +43,11 @@ public class Tower {
         return "t";
     }
 
+    public int getPrice(){
+        if (type == 1) return 300;
+        else return 700;
+    }
+
     public String getPath() {
         if (this.type ==1 ) return "src/main/resources/tower.png";
         else return "src/main/resources/tower1.png";

@@ -209,7 +209,6 @@ public class App extends Application {
             ImageView view = new ImageView(image);
             view.setFitHeight(60);
             view.setFitWidth(60);
-            System.out.println(rowidx);
             gridPane.add(view,colidx,rowidx,3,3);
             GridPane.setHalignment(view, HPos.CENTER);
         }
@@ -241,7 +240,7 @@ public class App extends Application {
     public void handle(GridPane gridPane, int colIndex, int rowIndex, int col, int row) { // otwiera się okno ze sklepem
         Stage stageShop = new Stage();
         stageShop.setTitle("Shop");
-        Shop shop = new Shop(stageShop, gridPane, colIndex, rowIndex, col, row, map1);
+        Shop shop = new Shop(stageShop, gridPane, colIndex, rowIndex, col, row, map1,stage);
         Scene shopping = new Scene(shop.getVB(), 400, 400);
         stageShop.setResizable(false);
         stageShop.setScene(shopping);

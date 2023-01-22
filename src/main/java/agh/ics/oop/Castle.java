@@ -13,8 +13,6 @@ public class Castle {
         this.upperLeft = upperLeft;
         this.lowerLeft = new Vector2d(upperLeft.x, lowerRight.y);
         this.upperRight = new Vector2d(lowerRight.x, upperLeft.y);
-        System.out.println("Zamek upper: " +upperLeft.toString());
-        System.out.println("Zamek lower: " + lowerRight.toString());
     }
     public boolean isDestroyed(){
         return health <= 0;

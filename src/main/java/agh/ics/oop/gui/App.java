@@ -105,13 +105,24 @@ public class App extends Application {
         gridPane.getChildren().clear();
         gridPane = new GridPane();
         BorderPane border = new BorderPane();
+        Label label = new Label();
+        label.setFont(new Font("Arial", 20));
+        BorderPane.setMargin(label, new Insets(0,0,50,0));
+        border.setBottom(label);
 
         Label chooseLabel = new Label("Choose a map \uD83D\uDDFA");
         chooseLabel.setFont(new Font("Arial", 50));
 
-        Button m1 = new Button();
-        Button m2 = new Button();
-        Button m3 = new Button();
+        Button m1 = new Button("BASIC \uD83C\uDFF0");
+        Button m2 = new Button("FLOOD \uD83C\uDF0A");
+        Button m3 = new Button("EXTENDED ⭐️");
+
+        styleButtonHover(m1);
+        m1.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
+        styleButtonHover(m2);
+        m2.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
+        styleButtonHover(m3);
+        m3.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
 
         m1.setOnMouseClicked(event -> {
             this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 5, 300);
@@ -129,10 +140,30 @@ public class App extends Application {
         HBox hBox = new HBox(40, m1, m2, m3);
         hBox.setAlignment(Pos.CENTER);
 
-        VBox vBox = new VBox(100, chooseLabel, hBox);
-        vBox.setAlignment(Pos.CENTER);
+        m1.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+            VBox info = Information(1);
+            border.setBottom(info);
+            BorderPane.setAlignment(info, Pos.CENTER);
+        });
+        m2.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+            VBox info = Information(2);
+            border.setBottom(info);
+            BorderPane.setAlignment(info, Pos.CENTER);
+        });
+        m3.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+            VBox info = Information(3);
+            border.setBottom(info);
+            BorderPane.setAlignment(info, Pos.CENTER);
+        });
 
-        border.setCenter(vBox);
+        m1.addEventHandler(MouseEvent.MOUSE_EXITED, event -> border.setBottom(label));
+        m2.addEventHandler(MouseEvent.MOUSE_EXITED, event -> border.setBottom(label));
+        m3.addEventHandler(MouseEvent.MOUSE_EXITED, event -> border.setBottom(label));
+
+        VBox vB = new VBox(100, chooseLabel, hBox);
+        vB.setAlignment(Pos.CENTER);
+
+        border.setCenter(vB);
         border.setStyle("-fx-background-image: url('bckg.jpg');");
 
         BorderPane.setAlignment(chooseLabel,Pos.CENTER);
@@ -141,6 +172,20 @@ public class App extends Application {
         scene.setRoot(border);
         stage.setScene(scene);
         stage.show();
+    }
+
+    public VBox Information(int option){
+        Label label;
+        if (option == 1) label = new Label("Basic version, two types of towers to buy");
+        else if (option == 2) label = new Label("Inaccessible to enemies places on the map that have been flooded");
+        else label = new Label("Premium version, you can buy health for castle and improve towers range");
+        label.setFont(new Font("Arial", 20));
+        VBox box = new VBox(label);
+        box.setStyle("-fx-background-color: #ffdd99;");
+        box.setAlignment(Pos.CENTER);
+        box.setMaxWidth(800);
+        BorderPane.setMargin(box, new Insets(0,0,50,0));
+        return box;
     }
 
     public void drawMap() throws FileNotFoundException {
@@ -228,7 +273,7 @@ public class App extends Application {
         Image image = new Image(new FileInputStream("src/main/resources/castle.png"));
         ImageView view = new ImageView(image);
         Castle castle = map1.getCastle();
-        view.setFitWidth(220);
+        view.setFitWidth(200);
         view.setFitHeight(200);
 
         double progress = castle.getHealth() / castle.maxHealth;

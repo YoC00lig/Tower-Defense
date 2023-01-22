@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 public class GameEngine implements Runnable, IEngine{
     private GameMap map;
     private boolean isRunning;
-    public final int moveDelay = 300;
+    public final int moveDelay = 600;
     private final App app;
 
     public GameEngine(GameMap map, App app){

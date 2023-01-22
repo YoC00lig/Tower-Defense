@@ -35,6 +35,7 @@ public class Shop {
         this.col = col;
         this.row = row;
         this.map = map;
+        this.stage.setAlwaysOnTop(true);
         try {
             create();
         } catch (FileNotFoundException e) {

@@ -21,35 +21,38 @@ public class GameEngine implements Runnable, IEngine{
     }
 
     public void updateMap(){
-        if(this.isRunning){
-            map.moveAll();   // ruch wrogów
-            map.attackCastle();  // atak wrogów na zamek
-            map.attackTowers();  // atak wrogów na wieże
-            map.deleteDeadTowers();   // usunięcie zniszczonych wież
-            map.shotFromTowers();     // atak wież na wrogów
-            map.deleteDeadEnemies();  // usunięcie martwych wrogów
-            map.removeHits();    // reset informacji o tym czy wróg zaatakował
-            map.enemiesWave();   // wygenerowanie fali wrogów
-        }
+        map.moveAll();   // ruch wrogów
+        map.attackCastle();  // atak wrogów na zamek
+        map.attackTowers();  // atak wrogów na wieże
+        map.deleteDeadTowers();   // usunięcie zniszczonych wież
+        map.shotFromTowers();     // atak wież na wrogów
+        map.deleteDeadEnemies();  // usunięcie martwych wrogów
+        map.removeHits();    // reset informacji o tym czy wróg zaatakował
+        map.enemiesWave();   // wygenerowanie fali wrogów
     }
 
     @Override
     public void run() {
-        while (map.getCastle().getHealth() >= 0) {
+        while (true) {
             updateMap();
             try {
                 app.draw();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                System.exit(0);
                 throw new RuntimeException(e);
             }
             try {
                 Thread.sleep(this.moveDelay);
             } catch (InterruptedException e) {
+                System.exit(0);
                 break;
             }
+            if (map.getCastle().getHealth() < 0) break;
         }
         Thread.interrupted();
+        System.exit(0);
+        app.stage.close();
     }
 
 }

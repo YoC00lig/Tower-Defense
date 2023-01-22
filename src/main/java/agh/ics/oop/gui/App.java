@@ -24,10 +24,11 @@ import javafx.application.Platform;
 
 public class App extends Application {
     private GridPane gridPane = new GridPane();
-    private final Stage stage = new Stage();
+    public final Stage stage = new Stage();
     HBox mainbox;
     GameMap map1;
     GameEngine engine;
+    Scene scene;
 
     public static void main(String[] args) {
         launch(args);
@@ -92,9 +93,11 @@ public class App extends Application {
         gridPane.add(border,0,0);
         gridPane.setAlignment(Pos.CENTER);
 
-        stage.setScene(new Scene(gridPane,1500,1000));
+        scene = new Scene(gridPane,1500,1000);
+        stage.setScene(scene);
         stage.setResizable(false);
         stage.setTitle("Tower defence");
+        stage.setOnCloseRequest(event -> System.exit(0));
         stage.show();
 
     }
@@ -107,24 +110,24 @@ public class App extends Application {
         Label chooseLabel = new Label("Choose a map \uD83D\uDDFA");
         chooseLabel.setFont(new Font("Arial", 50));
 
-        Button map1 = new Button();
-        Button map2 = new Button();
-        Button map3 = new Button();
+        Button m1 = new Button();
+        Button m2 = new Button();
+        Button m3 = new Button();
 
-        map1.setOnMouseClicked(event -> {
+        m1.setOnMouseClicked(event -> {
             this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 6, 300);
             engine = new GameEngine(this.map1, this);
             Thread thread = new Thread(engine);
             thread.start();
         });
 
-        map2.setOnMouseClicked(event -> {
+        m2.setOnMouseClicked(event -> {
         });
 
-        map3.setOnMouseClicked(event -> {
+        m3.setOnMouseClicked(event -> {
         });
 
-        HBox hBox = new HBox(40, map1, map2, map3);
+        HBox hBox = new HBox(40, m1, m2, m3);
         hBox.setAlignment(Pos.CENTER);
 
         VBox vBox = new VBox(100, chooseLabel, hBox);
@@ -136,8 +139,8 @@ public class App extends Application {
         BorderPane.setAlignment(chooseLabel,Pos.CENTER);
         BorderPane.setAlignment(hBox,Pos.CENTER);
 
-
-        stage.setScene(new Scene(border,1500,1000));
+        scene.setRoot(border);
+        stage.setScene(scene);
         stage.show();
     }
 
@@ -191,6 +194,26 @@ public class App extends Application {
             }
         }
 
+        for (Tower tower: map1.listOfTowers){
+            String path = tower.getPath();
+            Vector2d pos = tower.getUpperLeft();
+            int colidx = pos.x - low.x + 1;
+            int rowidx = high.y - pos.y + 1;
+            Image image;
+            try {
+                image = new Image(new FileInputStream(path));
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            ImageView view = new ImageView(image);
+            view.setFitHeight(60);
+            view.setFitWidth(60);
+            System.out.println(rowidx);
+            gridPane.add(view,colidx,rowidx,3,3);
+            GridPane.setHalignment(view, HPos.CENTER);
+        }
+
         Image image = new Image(new FileInputStream("src/main/resources/castle.png"));
         ImageView view = new ImageView(image);
         Castle castle = map1.getCastle();
@@ -209,8 +232,9 @@ public class App extends Application {
         mainbox.setAlignment(Pos.CENTER);
         mainbox.setStyle("-fx-background-color: #1f2e2e;");
 
+        scene.setRoot(mainbox);
         stage.setResizable(false);
-        stage.setScene(new Scene(mainbox,1500,1000));
+        stage.setScene(scene);
         stage.show();
     }
 
@@ -242,13 +266,16 @@ public class App extends Application {
                 drawMap();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                System.exit(0);
                 throw new RuntimeException(e);
             }
         });
+
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            System.exit(0);
         }
     }
 }

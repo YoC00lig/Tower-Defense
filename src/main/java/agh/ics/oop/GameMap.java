@@ -155,9 +155,11 @@ public class GameMap {
         int strength;
         for (Tower tower : listOfTowers) {
             Enemy nearestEnemy = findNearestEnemy(tower);
-            strength = nearestEnemy.getStrength();
-            value = random.nextInt(5 * strength);
-            nearestEnemy.subtractHealth(value);
+            if (nearestEnemy != null){
+                strength = nearestEnemy.getStrength();
+                value = random.nextInt(5 * strength);
+                nearestEnemy.subtractHealth(value);
+            }
         }
     }
 
@@ -211,7 +213,7 @@ public class GameMap {
         }
     }
 
-    // atak na wierzę
+    // atak na wieżę
     public void attackTowers() {
         Random random = new Random();
         int value;
@@ -262,14 +264,15 @@ public class GameMap {
         Vector2d low = new Vector2d(upperLeft.x, upperLeft.y - 2);
         Vector2d high = new Vector2d(upperLeft.x + 2, upperLeft.y);
         Tower tower;
-        if (type == 1) tower = new Tower(100, 1, low, high);
-        else tower = new Tower(100, 2, low, high);
+        if (type == 1) tower = new Tower(100, 1, low, high,1);
+        else tower = new Tower(100, 2, low, high,2);
         return tower;
     }
 
     public void addTower(Tower tower) {
         Vector2d upperLeft_ = tower.getUpperLeft();
         towers.put(upperLeft_, tower);
+        listOfTowers.add(tower);
     }
     public boolean checkIfCanPlaceTower(Tower tower) {
         boolean left = !buildingAt(tower.getUpperLeft()) && !buildingAt(tower.getLowerLeft());

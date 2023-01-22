@@ -5,12 +5,14 @@ public class Tower {
     private Vector2d upperRight;
     private int health;
     private int range;
+    public int type;
 
-    public Tower(int health, int range, Vector2d lowerLeft, Vector2d upperRight){
+    public Tower(int health, int range, Vector2d lowerLeft, Vector2d upperRight, int type){
         this.health = health;
         this.range = range;
         this.lowerLeft = lowerLeft;
         this.upperRight = upperRight;
+        this.type = type;
     }
 
     public int getHealth(){
@@ -39,6 +41,11 @@ public class Tower {
 
     public String toString(){
         return "t";
+    }
+
+    public String getPath() {
+        if (this.type ==1 ) return "src/main/resources/tower.png";
+        else return "src/main/resources/tower1.png";
     }
 
 }

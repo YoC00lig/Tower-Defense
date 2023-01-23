@@ -115,7 +115,7 @@ public class App extends Application {
 
         Button m1 = new Button("BASIC \uD83C\uDFF0");
         Button m2 = new Button("FLOOD \uD83C\uDF0A");
-        Button m3 = new Button("EXTENDED ⭐️");
+        Button m3 = new Button("EXTENDED");
 
         styleButtonHover(m1);
         m1.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
@@ -125,7 +125,7 @@ public class App extends Application {
         m3.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
 
         m1.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 5, 1000);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 0);
             engine = new GameEngine(this.map1, this);
             Thread thread = new Thread(engine);
             thread.start();

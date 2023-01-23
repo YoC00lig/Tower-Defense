@@ -16,21 +16,35 @@ public class GameMap  implements  IPositionChangeObserver{
     public static int size;
     private int spawnCountdown;
     private int initialSpawnCountdown;
-    public int startEnemies, money;
-    private ArrayList<Integer> waveSizes = new ArrayList<>();
-    private int waveIndex;
+    public int  money;
+    private int waveIndex = 1;
+    public int[][] waveSizes = {};
+    private int[][] waveVariant1 = {{10,0,0}, {8,5,0}, {5, 5, 5}, {0,10,5}};
+    private int[][] waveVariant2;
+    private int[][] waveVariant3;
 
 
-    public GameMap(Vector2d lowerRight, Vector2d upperLeft,  int initialNumberOfEnemies, int InitMoney) {
+    public GameMap(Vector2d lowerRight, Vector2d upperLeft, int InitMoney, int mapVariant) {
         if ((Math.abs(lowerRight.x - upperLeft.x) <= 10) || (Math.abs(lowerRight.y - upperLeft.y) <= 10)) {
             throw new IllegalArgumentException("Incorrect map coordinates, map must be bigger.");
         }
         this.lowerRight = lowerRight;
         this.upperLeft = upperLeft;
-        this.startEnemies = initialNumberOfEnemies;
         size = lowerRight.x - upperLeft.x;
-        this.initialSpawnCountdown = 0;
+        this.initialSpawnCountdown = 10;
+        this.spawnCountdown = 10;
         this.money = InitMoney;
+        if (mapVariant == 0) {
+            this.waveSizes = this.waveVariant1;
+        }
+        /*
+        else if (mapVariant == 1){
+            waveSizes = this.waveVariant2;
+        }
+        else if (mapVariant == 2){
+            waveSizes = this.waveVariant3;
+        }*/
+
         placeCastle();
     }
 
@@ -45,7 +59,8 @@ public class GameMap  implements  IPositionChangeObserver{
         Random random = new Random(); // [min,max]
         return random.nextInt((max - min) + 1) + min;
     }
-    public void placeEnemy() {
+
+    public void placeEnemy(int enemyVariant) {
         Vector2d position;
         Random random = new Random();
         int side = random.nextInt(4);
@@ -55,12 +70,28 @@ public class GameMap  implements  IPositionChangeObserver{
             case 2 -> new Vector2d(getRandomFromRange(upperLeft.x,lowerRight.x), upperLeft.y); //upper
             default -> new Vector2d(lowerRight.x, getRandomFromRange(lowerRight.y,upperLeft.y)); // right
         };
+        if (enemyVariant == 0) {
+            Enemy enemy = new Enemy(10, 1, position, this);
+            this.listOfEnemies.add(enemy);
+            this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
+            this.enemies.get(position).add(enemy);
+            enemy.addObserver(this);
+        }
+        else if (enemyVariant == 1) {
+            Enemy enemy = new Enemy(20, 2, position, this);
+            this.listOfEnemies.add(enemy);
+            this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
+            this.enemies.get(position).add(enemy);
+            enemy.addObserver(this);
+        }
+        else if (enemyVariant == 3) {
+            Enemy enemy = new Enemy(30, 2, position, this);
+            this.listOfEnemies.add(enemy);
+            this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
+            this.enemies.get(position).add(enemy);
+            enemy.addObserver(this);
+        }
 
-        Enemy enemy = new Enemy(10, 1, position, this);
-        this.listOfEnemies.add(enemy);
-        this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
-        this.enemies.get(position).add(enemy);
-        enemy.addObserver(this);
     }
 
     // szukanie najbliższego wroga, do którego strzela wieża w jednum ruchu
@@ -228,14 +259,17 @@ public class GameMap  implements  IPositionChangeObserver{
 
     // fale wrogów
     public void enemiesWave() {
-        if (this.waveIndex < this.waveSizes.size()) {  //
+        if (this.waveIndex < this.waveSizes.length) {  //
             if (this.spawnCountdown <= 0) {
-                for (int i = 0; i < waveSizes.get(waveIndex); i++) placeEnemy();
-                this.initialSpawnCountdown -= 5;
+                for (int i = 0; i < this.waveSizes[waveIndex].length; i++){
+                    for(int j = 0; j < this.waveSizes[waveIndex][i]; j++)
+                        this.placeEnemy(i);
+                }
+                this.initialSpawnCountdown -= 2;
                 this.spawnCountdown = this.initialSpawnCountdown;
                 this.waveIndex += 1;
             } else {
-                this.spawnCountdown -= 1;
+                this.spawnCountdown -= 2;
             }
         }
     }

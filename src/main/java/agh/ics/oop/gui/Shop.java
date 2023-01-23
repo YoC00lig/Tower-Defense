@@ -123,6 +123,8 @@ public class Shop {
                 BorderPane.setAlignment(label, Pos.CENTER);
                 BorderPane.setMargin(label, new Insets(40,0,0,0));
                 pane1.setTop(label);
+            }else if (!map.checkIfCanPlaceTower(tower)) {
+                stage.close();
             }
         });
         btn2.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -138,6 +140,8 @@ public class Shop {
                 BorderPane.setAlignment(label, Pos.CENTER);
                 BorderPane.setMargin(label, new Insets(40,0,0,0));
                 pane2.setTop(label);
+            } else if (!map.checkIfCanPlaceTower(tower)) {
+                stage.close();
             }
         });
         styleButtonHover(btn1);

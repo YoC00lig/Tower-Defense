@@ -125,7 +125,7 @@ public class App extends Application {
         m3.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
 
         m1.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 5, 300);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 5, 1000);
             engine = new GameEngine(this.map1, this);
             Thread thread = new Thread(engine);
             thread.start();
@@ -201,7 +201,7 @@ public class App extends Application {
         gridPane.getRowConstraints().add(new RowConstraints(size));
         gridPane.getColumnConstraints().add(new ColumnConstraints(size));
         GridPane.setHalignment(label, HPos.CENTER);
-        gridPane.setGridLinesVisible(false);
+        gridPane.setGridLinesVisible(true);
 
         for (int i = low.x; i <= high.x; i++){
             Label numberX = new Label("" + i );
@@ -239,7 +239,7 @@ public class App extends Application {
         }
 
         for (Tower tower: map1.listOfTowers){
-            String path = tower.getPath();
+            String path = tower.getPath(tower);
             Vector2d pos = tower.getUpperLeft();
             int colidx = pos.x - low.x + 1;
             int rowidx = high.y - pos.y + 1;
@@ -270,9 +270,9 @@ public class App extends Application {
             GridPane.setHalignment(view, HPos.CENTER);
         }
 
+        Castle castle = map1.getCastle();
         Image image = new Image(new FileInputStream("src/main/resources/castle.png"));
         ImageView view = new ImageView(image);
-        Castle castle = map1.getCastle();
         view.setFitWidth(200);
         view.setFitHeight(200);
 
@@ -294,7 +294,7 @@ public class App extends Application {
 
         VBox box = new VBox(castleHB, view);
         box.setAlignment(Pos.CENTER);
-        gridPane.add(box,  castle.getUpperLeft().x, castle.getUpperLeft().y,10,10);
+        gridPane.add(box,  castle.getUpperLeft().x -low.x + 1, high.y - castle.getUpperLeft().y + 1,10,10);
         mainbox = new HBox(gridPane);
         mainbox.setAlignment(Pos.CENTER);
         mainbox.setStyle("-fx-background-color: #1f2e2e;");

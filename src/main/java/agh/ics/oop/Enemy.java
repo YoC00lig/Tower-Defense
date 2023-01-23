@@ -7,13 +7,10 @@ public class Enemy implements IMapElement{
     private int strength;
     private Vector2d position;
     protected List<IPositionChangeObserver> observers = new ArrayList<>();
-
     private boolean madeHit; // czy w ruchu juz uderzył
     ArrayList<Vector2d> steps;
-
     private int nextMove;
-
-
+    private IMapElement destination;
 
     public Enemy(int health, int strength, Vector2d position, GameMap map){
         this.health = health;
@@ -22,10 +19,8 @@ public class Enemy implements IMapElement{
         this.map = map;
         this.madeHit = false;
         this.steps = BFS(this.position);
-        for (Vector2d step: steps){
-            System.out.println(step.toString());
-        }
         this.nextMove = 1;
+        this.destination = map.getCastle();
     }
 
     public void subtractHealth(int value){
@@ -90,8 +85,7 @@ public class Enemy implements IMapElement{
 
         while (queue.size() != 0) {
             p = queue.poll();
-            if (map.isNextToCastle(p)) {
-                System.out.println("p: " + p.toString());
+            if (map.isNextToCastle(p) || map.isNextToTower(p)) {
                 return backtrace(s, p, parents);
             }
 
@@ -138,13 +132,17 @@ public class Enemy implements IMapElement{
     }
 
     public void move() {
-        System.out.println(steps.size());
-        if (this.nextMove < steps.size()) {
+        IMapElement building = this.map.findNearestObject(this);
+        if (building != this.destination){
+            this.steps = BFS(this.position);
+            this.nextMove = 1;
+            this.destination = building;
+        }
+        else{
             Vector2d newPosition = steps.get(this.nextMove);
             positionChanged(this.position, newPosition);
-            this.position = steps.get(this.nextMove);
+            this.position = newPosition;
             this.nextMove += 1;
         }
-
     }
 }

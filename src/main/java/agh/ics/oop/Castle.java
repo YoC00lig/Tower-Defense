@@ -1,6 +1,6 @@
 package agh.ics.oop;
 
-public class Castle {
+public class Castle implements IMapElement{
     private int health;
     public double maxHealth;
     private Vector2d lowerRight, lowerLeft;
@@ -39,5 +39,12 @@ public class Castle {
 
     public void subtractHealth(int value){
         this.health -= value;
+    }
+
+    public String getPath(IMapElement object){
+        return "src/main/resources/castle.png";
+    }
+    public Vector2d getPosition(){
+        return this.upperLeft;
     }
 }

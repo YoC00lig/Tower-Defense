@@ -1,6 +1,6 @@
 package agh.ics.oop;
 
-public class Tower {
+public class Tower implements IMapElement{
     private Vector2d lowerLeft;
     private Vector2d upperRight;
     private int health;
@@ -61,9 +61,12 @@ public class Tower {
         boolean bottom = position.y == this.getLowerLeft().y - 1 && position.x >= this.getLowerLeft().x && position.x <= this.getLowerRight().x;
         return left || right || top || bottom;
     }
-    public String getPath() {
+    public String getPath(IMapElement object) {
         if (this.type ==1 ) return "src/main/resources/tower.png";
         else return "src/main/resources/tower1.png";
     }
 
+    public Vector2d getPosition() {
+        return this.getUpperLeft();
+    }
 }

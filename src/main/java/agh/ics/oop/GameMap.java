@@ -35,8 +35,8 @@ public class GameMap  implements  IPositionChangeObserver{
     }
 
     private void placeCastle() {
-        Vector2d upperLeft_ = new Vector2d((lowerRight.x-10)/2, (upperLeft.y-10)/2);
-        Vector2d lowerLeft_ = new Vector2d(upperLeft_.x, upperLeft_.y+9);
+        Vector2d upperLeft_ = new Vector2d((lowerRight.x-10)/2, (upperLeft.y-10)/2 + 9);
+        Vector2d lowerLeft_ = new Vector2d(upperLeft_.x, upperLeft_.y-9);
         Vector2d lowerRight_ = new Vector2d(lowerLeft_.x+9, lowerLeft_.y);
         this.castle = new Castle(500,lowerRight_,upperLeft_);
     }
@@ -74,7 +74,7 @@ public class GameMap  implements  IPositionChangeObserver{
             double currDist = sqrt(pow(currPosition.x - position.x, 2) + pow(currPosition.y - position.y, 2));
             if (currDist < sqrt(pow(nearestPosition.x - position.x, 2) + pow(nearestPosition.y - position.y, 2)) && currDist < range) {
                 nearestPosition = currPosition;
-                nearestEnemy = entry.getValue().get(0);
+                if (entry.getValue().size() > 0) nearestEnemy = entry.getValue().get(0);
             }
         }
         return nearestEnemy;
@@ -283,6 +283,68 @@ public class GameMap  implements  IPositionChangeObserver{
         LinkedList<Enemy> NewPlace = this.enemies.get(newPos);
         OldPlace.remove(enemy);
         NewPlace.add(enemy);
+    }
+
+    // wyszukiwanie najbliższego obiektu dla wroga
+    public static boolean isValid(Vector2d v, GameMap map) {
+        return !map.buildingAt(v) && v.x >= map.upperLeft.x && v.x <= map.lowerRight.x && v.y >= map.lowerRight.y && v.y <= map.upperLeft.y;
+    }
+    public int BFS(Vector2d s, Vector2d destination) {
+        boolean[][] visited = new boolean[this.lowerRight.x+1][this.upperLeft.y+1];
+        int[][] dist = new int[this.lowerRight.x + 1][this.upperLeft.y + 1];
+        LinkedList<Vector2d> queue = new LinkedList<>();
+        visited[s.x][s.y] = true;
+        queue.add(s);
+        dist[s.x][s.y] = 1;
+        Vector2d p;
+
+        while (queue.size() != 0) {
+            p = queue.poll();
+            if (p.equals(destination)) return dist[p.x][p.y];
+            ArrayList<Vector2d> next_vectors = new ArrayList<>();
+            int x = p.x;
+            int y = p.y;
+            next_vectors.add(new Vector2d(x, y - 1));
+            next_vectors.add(new Vector2d(x, y + 1));
+            next_vectors.add(new Vector2d(x - 1, y));
+            next_vectors.add(new Vector2d(x + 1, y));
+            next_vectors.add(new Vector2d(x - 1, y + 1));
+            next_vectors.add(new Vector2d(x - 1, y - 1));
+            next_vectors.add(new Vector2d(x + 1, y + 1));
+            next_vectors.add(new Vector2d(x + 1, y - 1));
+
+            for (Vector2d next_step : next_vectors) {
+                int nx = next_step.x;
+                int ny = next_step.y;
+
+                if (isValid(next_step, this) && !visited[nx][ny]) {
+                    visited[nx][ny] = true;
+                    queue.add(next_step);
+                    dist[nx][ny] = dist[p.x][p.y] + 1;
+                }
+            }
+        }
+        return -1;
+    }
+
+    public IMapElement findNearestObject(Enemy enemy){
+        IMapElement object = null;
+        Vector2d position = enemy.getPosition();
+        int dist = Integer.MAX_VALUE;
+        int tmp;
+        for (Tower tower: this.listOfTowers){
+            tmp = Math.min(BFS(position, tower.getUpperLeft()), BFS(position, tower.getLowerLeft()));
+            tmp = Math.min(tmp, BFS(position, tower.getUpperRight()));
+            tmp = Math.min(tmp, BFS(position, tower.getLowerRight()));
+            if (tmp < dist) {
+                dist = tmp;
+                object = tower;
+            }
+        }
+        if (enemy.BFS(position).size() < dist){
+            object = castle;
+        }
+        return object;
     }
 
     public void moveAll(){

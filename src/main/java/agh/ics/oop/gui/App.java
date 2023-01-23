@@ -29,6 +29,7 @@ public class App extends Application {
     GameMap map1;
     GameEngine engine;
     Scene scene;
+    boolean floodMode = false;
 
     public static void main(String[] args) {
         launch(args);
@@ -116,6 +117,9 @@ public class App extends Application {
         Button m1 = new Button("BASIC \uD83C\uDFF0");
         Button m2 = new Button("FLOOD \uD83C\uDF0A");
         Button m3 = new Button("EXTENDED");
+        m1.setFont(new Font("Arial", 20));
+        m2.setFont(new Font("Arial", 20));
+        m3.setFont(new Font("Arial", 20));
 
         styleButtonHover(m1);
         m1.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
@@ -125,13 +129,18 @@ public class App extends Application {
         m3.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
 
         m1.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 0);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 0, false);
             engine = new GameEngine(this.map1, this);
             Thread thread = new Thread(engine);
             thread.start();
         });
 
         m2.setOnMouseClicked(event -> {
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 0, true);
+            floodMode = true;
+            engine = new GameEngine(this.map1, this);
+            Thread thread = new Thread(engine);
+            thread.start();
         });
 
         m3.setOnMouseClicked(event -> {
@@ -270,11 +279,22 @@ public class App extends Application {
             GridPane.setHalignment(view, HPos.CENTER);
         }
 
+        if (floodMode){
+            for (Vector2d pos : map1.cells){
+                VBox elem = new VBox();
+                elem.setMinWidth(20);
+                elem.setMinHeight(20);
+                elem.setStyle("-fx-background-color: #b3e6ff;");
+                gridPane.add(elem,  pos.x - low.x + 1, high.y - pos.y + 1);
+                GridPane.setHalignment(elem, HPos.CENTER);
+            }
+        }
+
         Castle castle = map1.getCastle();
         Image image = new Image(new FileInputStream("src/main/resources/castle.png"));
         ImageView view = new ImageView(image);
         view.setFitWidth(200);
-        view.setFitHeight(200);
+        view.setFitHeight(180);
 
         double progress = castle.getHealth() / castle.maxHealth;
         ProgressBar castleHB = new ProgressBar(Math.min(1.00, progress));
@@ -316,9 +336,7 @@ public class App extends Application {
     }
     private void addPane(int colIndex, int rowIndex, int row, int col) {
         Pane pane = new Pane();
-        pane.setOnMouseClicked(e -> {
-            handle(gridPane, colIndex, rowIndex, col, row);
-        });
+        pane.setOnMouseClicked(e -> handle(gridPane, colIndex, rowIndex, col, row));
         gridPane.add(pane, colIndex, rowIndex);
     }
 

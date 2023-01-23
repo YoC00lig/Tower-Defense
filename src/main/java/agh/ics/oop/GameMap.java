@@ -22,9 +22,11 @@ public class GameMap  implements  IPositionChangeObserver{
     private int[][] waveVariant1 = {{10,0,0}, {8,5,0}, {5, 5, 5}, {0,10,5}};
     private int[][] waveVariant2;
     private int[][] waveVariant3;
+    boolean floodMode;
+    public ArrayList<Vector2d> cells;
 
 
-    public GameMap(Vector2d lowerRight, Vector2d upperLeft, int InitMoney, int mapVariant) {
+    public GameMap(Vector2d lowerRight, Vector2d upperLeft, int InitMoney, int mapVariant, boolean flood) {
         if ((Math.abs(lowerRight.x - upperLeft.x) <= 10) || (Math.abs(lowerRight.y - upperLeft.y) <= 10)) {
             throw new IllegalArgumentException("Incorrect map coordinates, map must be bigger.");
         }
@@ -34,7 +36,8 @@ public class GameMap  implements  IPositionChangeObserver{
         this.initialSpawnCountdown = 10;
         this.spawnCountdown = 10;
         this.money = InitMoney;
-        if (mapVariant == 0) {
+        this.floodMode = flood;
+        if (mapVariant == 1) {
             this.waveSizes = this.waveVariant1;
         }
         /*
@@ -46,6 +49,7 @@ public class GameMap  implements  IPositionChangeObserver{
         }*/
 
         placeCastle();
+        if (flood) this.cells = generateFloodVectors();
     }
 
     private void placeCastle() {
@@ -190,6 +194,7 @@ public class GameMap  implements  IPositionChangeObserver{
             Vector2d pos = enemy.getPosition();
             this.enemies.get(pos).remove(enemy);
             this.listOfEnemies.remove(enemy);
+            enemy.removeObserver(this);
         }
     }
 
@@ -300,6 +305,7 @@ public class GameMap  implements  IPositionChangeObserver{
 
     // poruszanie przeciwników - jeden ruch
     public boolean buildingAt(Vector2d position){
+        if(floodMode && this.cells != null && this.cells.contains(position)) return true;
         for (Tower tower: towers.values()) { // sprawdzanie czy jakaś wieża tam nie stoi
             Vector2d low = tower.getLowerLeft();
             Vector2d high = tower.getUpperRight();
@@ -387,5 +393,20 @@ public class GameMap  implements  IPositionChangeObserver{
                 if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition())) enemy.move();
             }
         }
+    }
+    // flood mode
+    public ArrayList<Vector2d> generateFloodVectors(){
+        int number = 100;
+        ArrayList<Vector2d> cells = new ArrayList<>();
+        while (number > 0){
+            int x = (int) Math.floor(Math.random() *(this.lowerRight.x - this.upperLeft.x + 1) + this.upperLeft.x);
+            int y = (int) Math.floor(Math.random() *(this.upperLeft.y - this.lowerRight.y + 1) + this.lowerRight.y);
+            Vector2d pos = new Vector2d(x,y);
+            if (!buildingAt(pos) && !cells.contains(pos)){
+                number -= 1;
+                cells.add(pos);
+            }
+        }
+        return cells;
     }
 }

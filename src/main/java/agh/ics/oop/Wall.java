@@ -1,26 +1,19 @@
 package agh.ics.oop;
 
 public class Wall {
-    private Vector2d lowerRight;
-    private Vector2d upperLeft;
+    Vector2d position;
     private int health;
 
-    public Wall(int health, Vector2d lowerRight, Vector2d upperLeft){
+    public Wall(int health, Vector2d position){
         this.health = health;
-        this.lowerRight = lowerRight;
-        this.upperLeft = upperLeft;
+        this.position = position;
     }
 
     public int getHealth(){
         return this.health;
     }
-
-    public Vector2d getLowerRight(){
-        return this.lowerRight;
-    }
-
-    public Vector2d getUpperLeft(){
-        return this.upperLeft;
+    public Vector2d getPosition() {
+        return this.position;
     }
 
     public void subtractHealth(int value){

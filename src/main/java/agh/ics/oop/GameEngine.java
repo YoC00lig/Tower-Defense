@@ -15,8 +15,9 @@ public class GameEngine implements Runnable, IEngine{
         this.app =  app;
         this.isRunning = true;
 
-        for (int i = 0; i < map.startEnemies; i++){
-            map.placeEnemy();
+        for (int i = 0; i < map.waveSizes[0].length; i++){
+            for(int j = 0; j < map.waveSizes[0][i]; j++)
+                map.placeEnemy(i);
         }
     }
 

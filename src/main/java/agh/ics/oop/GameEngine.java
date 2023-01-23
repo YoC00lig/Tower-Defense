@@ -2,12 +2,13 @@ package agh.ics.oop;
 
 import agh.ics.oop.gui.App;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 
 public class GameEngine implements Runnable, IEngine{
     private GameMap map;
     private boolean isRunning;
-    public final int moveDelay = 800;
+    public final int moveDelay = 500;
     private final App app;
 
     public GameEngine(GameMap map, App app){
@@ -29,13 +30,22 @@ public class GameEngine implements Runnable, IEngine{
         map.shotFromTowers();     // atak wież na wrogów
         map.deleteDeadEnemies();  // usunięcie martwych wrogów
         map.removeHits();    // reset informacji o tym czy wróg zaatakował
+        map.removeMoves();
         map.enemiesWave();   // wygenerowanie fali wrogów
     }
 
     @Override
     public void run() {
+        try {
+            Thread.sleep(this.moveDelay);
+        } catch (InterruptedException e) {
+            System.exit(0);
+        }
         while (true) {
             updateMap();
+            if(map.getCastle().getHealth()<=0){
+                break;
+            }
             try {
                 app.draw();
             } catch (FileNotFoundException e) {
@@ -51,8 +61,8 @@ public class GameEngine implements Runnable, IEngine{
             }
         }
         Thread.interrupted();
-        System.exit(0);
-        app.stage.close();
+        //System.exit(0);
+        //app.stage.close();
     }
 
 }

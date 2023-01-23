@@ -137,6 +137,10 @@ public class Enemy implements IMapElement{
             this.steps = BFS(this.position);
             this.nextMove = 1;
             this.destination = building;
+            Vector2d newPosition = steps.get(this.nextMove);
+            positionChanged(this.position, newPosition);
+            this.position = newPosition;
+            this.nextMove += 1;
         }
         else{
             Vector2d newPosition = steps.get(this.nextMove);

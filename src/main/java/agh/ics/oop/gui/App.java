@@ -132,6 +132,11 @@ public class App extends Application {
             this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 1, false);
             engine = new GameEngine(this.map1, this);
             Thread thread = new Thread(engine);
+            try {
+                drawMap();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
             thread.start();
         });
 

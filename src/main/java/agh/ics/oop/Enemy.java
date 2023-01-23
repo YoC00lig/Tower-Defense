@@ -1,7 +1,8 @@
 package agh.ics.oop;
+
 import java.util.*;
 
-public class Enemy implements IMapElement{
+public class Enemy implements IMapElement {
     private int health;
     GameMap map;
     private int strength;
@@ -11,8 +12,9 @@ public class Enemy implements IMapElement{
     ArrayList<Vector2d> steps;
     private int nextMove;
     private IMapElement destination;
+    private boolean madeMove;
 
-    public Enemy(int health, int strength, Vector2d position, GameMap map){
+    public Enemy(int health, int strength, Vector2d position, GameMap map) {
         this.health = health;
         this.strength = strength;
         this.position = position;
@@ -21,31 +23,40 @@ public class Enemy implements IMapElement{
         this.steps = BFS(this.position);
         this.nextMove = 1;
         this.destination = map.getCastle();
+        this.madeMove = false;
     }
 
-    public void subtractHealth(int value){
+    public void subtractHealth(int value) {
         this.health -= value;
     }
 
-    public int getHealth(){
+    public int getHealth() {
         return this.health;
     }
 
-    public Vector2d getPosition(){
+    public Vector2d getPosition() {
         return this.position;
     }
 
-    public int getStrength(){
+    public int getStrength() {
         return this.strength;
     }
-    public boolean getMadeHit(){
+
+    public boolean getMadeHit() {
         return this.madeHit;
     }
-    public void changeMadeHit(boolean x){
+
+    public void changeMadeHit(boolean x) {
         this.madeHit = x;
     }
+    public boolean getMadeMove() {
+        return this.madeMove;
+    }
+    public void changeMadeMove(boolean x) {
+        this.madeMove = x;
+    }
 
-    public String toString(){
+    public String toString() {
         return "E";
     }
 
@@ -57,6 +68,7 @@ public class Enemy implements IMapElement{
     public static boolean isValid(Vector2d v, GameMap map) {
         return !map.buildingAt(v) && v.x >= map.upperLeft.x && v.x <= map.lowerRight.x && v.y >= map.lowerRight.y && v.y <= map.upperLeft.y;
     }
+
     // odtwarzanie ścieżki
     private ArrayList<Vector2d> backtrace(Vector2d start, Vector2d end, Map<Vector2d, Vector2d> parents) {
         ArrayList<Vector2d> result = new ArrayList<>();
@@ -117,23 +129,23 @@ public class Enemy implements IMapElement{
         return new ArrayList<>();
     }
 
-    private void positionChanged(Vector2d oldPosition, Vector2d newPosition){
+    private void positionChanged(Vector2d oldPosition, Vector2d newPosition) {
         for (IPositionChangeObserver observer : observers) {
             observer.positionChanged(oldPosition, newPosition, this);
         }
     }
 
-    public void addObserver(IPositionChangeObserver observer){
+    public void addObserver(IPositionChangeObserver observer) {
         observers.add(observer);
     }
 
-    public void removeObserver(IPositionChangeObserver observer){
+    public void removeObserver(IPositionChangeObserver observer) {
         observers.remove(observer);
     }
 
     public void move() {
         IMapElement building = this.map.findNearestObject(this);
-        if (building != this.destination){
+        if (building != this.destination) {
             this.steps = BFS(this.position);
             this.nextMove = 1;
             this.destination = building;
@@ -141,8 +153,7 @@ public class Enemy implements IMapElement{
             positionChanged(this.position, newPosition);
             this.position = newPosition;
             this.nextMove += 1;
-        }
-        else{
+        } else {
             Vector2d newPosition = steps.get(this.nextMove);
             positionChanged(this.position, newPosition);
             this.position = newPosition;

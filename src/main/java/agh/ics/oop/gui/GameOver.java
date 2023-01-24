@@ -6,6 +6,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -51,11 +53,19 @@ public class GameOver {
                 throw new RuntimeException(e);
             }
         });
+        styleButtonHover(playAgain);
+        playAgain.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 2em; ");
+        playAgain.setFont(new Font("Arial", 20));
+
         Button quit = new Button("QUIT GAME");
         quit.setOnMouseClicked(event -> {
             Platform.exit();
             System.exit(0);
         });
+        styleButtonHover(quit);
+        quit.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 2em; ");
+        quit.setFont(new Font("Arial", 20));
+
         HBox buttonHBox = new HBox(40, playAgain, quit);
         buttonHBox.setAlignment(Pos.CENTER);
 
@@ -113,5 +123,10 @@ public class GameOver {
 
     public GridPane getGP() {
         return this.gridPane;
+    }
+
+    public void styleButtonHover(Button B) {
+        B.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> B.setEffect(new DropShadow()));
+        B.addEventHandler(MouseEvent.MOUSE_EXITED, e -> B.setEffect(null));
     }
 }

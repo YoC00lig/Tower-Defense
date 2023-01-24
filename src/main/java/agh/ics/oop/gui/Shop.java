@@ -158,21 +158,16 @@ public class Shop {
         ImageView view1 = new ImageView(image1);
         view1.setFitWidth(200);
         view1.setFitHeight(150);
-        btn3 = new Button("BUY");
+        btn1 = new Button("BUY");
         pane1.setCenter(view1);
-        pane1.setBottom(btn3);
+        pane1.setBottom(btn1);
         BorderPane.setAlignment(label1, Pos.CENTER);
         BorderPane.setAlignment(view1, Pos.CENTER);
-        BorderPane.setAlignment(btn3, Pos.CENTER);
-        BorderPane.setMargin(btn3, new Insets(0,0,40,0));
+        BorderPane.setAlignment(btn1, Pos.CENTER);
+        BorderPane.setMargin(btn1, new Insets(0,0,40,0));
         BorderPane.setMargin(label1, new Insets(40,0,0,0));
-        box = new HBox(pane1);
-        box.setMinHeight(300);
-        box.setMinWidth(200);
-        box.setStyle("-fx-background-color: #1f2e2e;");
-        box.setAlignment(Pos.CENTER);
-        styleButtonHover(btn3);
-        btn3.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+        styleButtonHover(btn1);
+        btn1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (this.map.money - 900 >= 0) {
                 map.money -= 900;
                 tower.addRange();
@@ -182,6 +177,35 @@ public class Shop {
                 stage.close();
             }
         });
+
+        pane2 = new BorderPane();
+        Label label2 = new Label("$" + tower.getCurrentPriceToSell());
+        label2.setStyle("-fx-background-color: #ffd11a;");
+        pane2.setTop(label2);
+        Image image2 = new Image(new FileInputStream("src/main/resources/money.png"));
+        ImageView view2 = new ImageView(image2);
+        view2.setFitWidth(200);
+        view2.setFitHeight(150);
+        btn2 = new Button("SELL");
+        pane2.setCenter(view2);
+        pane2.setBottom(btn2);
+        BorderPane.setAlignment(label2, Pos.CENTER);
+        BorderPane.setAlignment(view2, Pos.CENTER);
+        BorderPane.setAlignment(btn2, Pos.CENTER);
+        BorderPane.setMargin(btn2, new Insets(0,0,40,0));
+        BorderPane.setMargin(label2, new Insets(40,0,0,0));
+        styleButtonHover(btn2);
+
+        btn2.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            map.sellTower(tower);
+            stage.close();
+        });
+
+        box = new HBox(pane1, pane2);
+        box.setMinHeight(300);
+        box.setMinWidth(400);
+        box.setStyle("-fx-background-color: #1f2e2e;");
+        box.setAlignment(Pos.CENTER);
     }
 
     public void styleButtons() { // Event listenery dla guzików BUY, żeby dodawać wieżę na mapę i do tablicy towers w GameMap

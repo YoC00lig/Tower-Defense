@@ -207,7 +207,7 @@ public class App extends Application {
         Label label;
         if (option == 1) label = new Label("Basic version, two types of towers to buy");
         else if (option == 2) label = new Label("Inaccessible to enemies places on the map that have been flooded");
-        else label = new Label("Premium version, you can buy health for castle and improve towers range");
+        else label = new Label("Premium version, you can buy health for castle, improve towers range and sell towers");
         label.setFont(new Font("Arial", 20));
         VBox box = new VBox(label);
         box.setStyle("-fx-background-color: #ffdd99;");

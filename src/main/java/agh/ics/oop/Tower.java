@@ -71,6 +71,9 @@ public class Tower implements IMapElement{
     public void addRange(){
         this.range += 1;
     }
+    public int getCurrentPriceToSell(){
+        return (int) Math.floor(((this.getHealth()/this.maxHealth) * this.getPrice()));
+    }
 
     public Vector2d getPosition() {
         return this.getUpperLeft();

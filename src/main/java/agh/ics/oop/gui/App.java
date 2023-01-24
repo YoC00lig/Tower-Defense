@@ -339,7 +339,9 @@ public class App extends Application {
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setStyle("-fx-background-color: #26734d;");
 
-        Label currMoney = new Label("Your money: " + map1.money);
+        Label currMoney;
+        if (this.thread.isAlive()) currMoney = new Label("Your money: " + map1.money);
+        else currMoney = new Label();
         currMoney.setStyle("-fx-text-fill: #ffffff;");
         HBox topBox = new HBox(currMoney,play);
         BorderPane.setAlignment(topBox, Pos.CENTER);

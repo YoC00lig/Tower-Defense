@@ -424,6 +424,7 @@ public class GameMap implements IPositionChangeObserver {
             if (!buildingAt(pos) && !cells.contains(pos)) {
                 number -= 1;
                 cells.add(pos);
+
             }
         }
         return cells;
@@ -464,6 +465,7 @@ public class GameMap implements IPositionChangeObserver {
         }
         return null;
     }
+    
     // sprzedawanie wież
     public void sellTowers(){
         if (this.soldTowers.size() > 0){
@@ -482,4 +484,12 @@ public class GameMap implements IPositionChangeObserver {
         this.soldTowers.add(tower);
         this.increaseMoney(tower.getCurrentPriceToSell());
     }
+
+    public int getWaveIndex(){
+        return this.waveIndex;
+    }
+    public int[] getDeadEnemies(){
+        return this.deadEnemies;
+    }
+
 }

@@ -6,12 +6,13 @@ import java.io.FileNotFoundException;
 public class GameEngine implements Runnable, IEngine{
     private GameMap map;
     private boolean isRunning;
-    public final int moveDelay = 150;
+    public final int moveDelay = 300;
     private final App app;
 
     public GameEngine(GameMap map, App app){
         this.map = map;
         this.app =  app;
+
         this.isRunning = true;
 
         for (int i = 0; i < map.waveSizes[0].length; i++){
@@ -43,7 +44,19 @@ public class GameEngine implements Runnable, IEngine{
         }
         while (true) {
             updateMap();
-            if(map.getCastle().getHealth()<=0){
+            if(this.map.getCastle().getHealth()<=0){
+                app.loose = true;
+                try {
+                    app.draw();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    System.exit(0);
+                    throw new RuntimeException(e);
+                }
+                break;
+            }
+            if(this.map.listOfEnemies.size()==0){
+                app.win = true;
                 break;
             }
             try {

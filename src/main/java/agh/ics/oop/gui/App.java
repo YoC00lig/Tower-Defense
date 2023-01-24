@@ -33,6 +33,8 @@ public class App extends Application {
     VBox box;
     Thread thread;
     Button play = drawButton();
+    public boolean loose = false;
+    public boolean win = false;
 
     public static void main(String[] args) {
         launch(args);
@@ -88,6 +90,7 @@ public class App extends Application {
         styleButtonHover(start);
         start.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 2em; ");
 
+
         BorderPane.setAlignment(welcomeLabel,Pos.CENTER);
         BorderPane.setAlignment(start,Pos.CENTER);
         BorderPane.setAlignment(pictures,Pos.CENTER);
@@ -108,6 +111,11 @@ public class App extends Application {
     public void mapChoice() throws FileNotFoundException {
         gridPane.getChildren().clear();
         gridPane = new GridPane();
+
+        play = drawButton();
+        loose = false;
+        win = false;
+
         BorderPane border = new BorderPane();
         Label label = new Label();
         label.setFont(new Font("Arial", 20));
@@ -378,6 +386,7 @@ public class App extends Application {
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
+
     }
 
     public void handle(GridPane gridPane, int colIndex, int rowIndex, int col, int row) { // otwiera się okno ze sklepem
@@ -389,6 +398,17 @@ public class App extends Application {
         stageShop.setScene(shopping);
         stageShop.show();
     }
+
+    public void drawGameOver(){
+        Stage gameOverStage = new Stage();
+        gameOverStage.setTitle("Game Over");
+        GameOver gameOver = new GameOver(gameOverStage, map1, stage,this);
+        Scene stats = new Scene(gameOver.getGP(), 700, 500);
+        gameOverStage.setResizable(false);
+        gameOverStage.setScene(stats);
+        gameOverStage.show();
+    }
+
     private void addPane(int colIndex, int rowIndex, int row, int col) {
         Pane pane = new Pane();
         pane.setOnMouseClicked(e -> handle(gridPane, colIndex, rowIndex, col, row));
@@ -403,7 +423,12 @@ public class App extends Application {
     public void draw() throws FileNotFoundException {
         Platform.runLater(() -> {
             try {
-                drawMap();
+                if(!loose && !win) {
+                    drawMap();
+                }
+                if(loose){
+                    drawGameOver();
+                }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 System.exit(0);

@@ -25,11 +25,13 @@ import javafx.application.Platform;
 public class App extends Application {
     private GridPane gridPane = new GridPane();
     public final Stage stage = new Stage();
-    HBox mainbox;
+    BorderPane mainbox = new BorderPane();
     GameMap map1;
     GameEngine engine;
     Scene scene;
     boolean floodMode = false;
+    Thread thread;
+    Button play = drawButton();
 
     public static void main(String[] args) {
         launch(args);
@@ -131,21 +133,24 @@ public class App extends Application {
         m1.setOnMouseClicked(event -> {
             this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 1, false);
             engine = new GameEngine(this.map1, this);
-            Thread thread = new Thread(engine);
+            thread = new Thread(engine);
             try {
                 drawMap();
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            thread.start();
         });
 
         m2.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 2, true);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1500, 2, true);
             floodMode = true;
             engine = new GameEngine(this.map1, this);
-            Thread thread = new Thread(engine);
-            thread.start();
+            thread = new Thread(engine);
+            try {
+                drawMap();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         m3.setOnMouseClicked(event -> {
@@ -200,6 +205,23 @@ public class App extends Application {
         box.setMaxWidth(800);
         BorderPane.setMargin(box, new Insets(0,0,50,0));
         return box;
+    }
+
+    public Button drawButton() {
+        Button startGame = new Button("Play");
+        styleButtonHover(startGame);
+        startGame.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 2em; ");
+        startGame.setFont(new Font("Arial", 20));
+        startGame.setAlignment(Pos.CENTER);
+        styleButtonHover(startGame);
+        BorderPane.setMargin(startGame, new Insets(20,0,20,0));
+
+        startGame.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            thread.start();
+            startGame.setDisable(true);
+            startGame.setText("Running");
+        });
+        return startGame;
     }
 
     public void drawMap() throws FileNotFoundException {
@@ -317,11 +339,21 @@ public class App extends Application {
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setStyle("-fx-background-color: #26734d;");
 
+        Label currMoney = new Label("Your money: " + map1.money);
+        currMoney.setStyle("-fx-text-fill: #ffffff;");
+        HBox topBox = new HBox(currMoney,play);
+        BorderPane.setAlignment(topBox, Pos.CENTER);
+        topBox.setAlignment(Pos.CENTER);
+        topBox.setSpacing(30);
+        mainbox.setTop(topBox);
+        BorderPane.setMargin(topBox, new Insets(20,0,20,0));
+        BorderPane.setAlignment(topBox, Pos.CENTER);
+
         VBox box = new VBox(castleHB, view);
         box.setAlignment(Pos.CENTER);
         gridPane.add(box,  castle.getUpperLeft().x -low.x + 1, high.y - castle.getUpperLeft().y + 1,10,10);
-        mainbox = new HBox(gridPane);
-        mainbox.setAlignment(Pos.CENTER);
+        mainbox.setCenter(gridPane);
+        BorderPane.setAlignment(gridPane, Pos.CENTER);
         mainbox.setStyle("-fx-background-color: #1f2e2e;");
 
         scene.setRoot(mainbox);

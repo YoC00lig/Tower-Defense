@@ -2,13 +2,11 @@ package agh.ics.oop;
 
 import agh.ics.oop.gui.App;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-
 
 public class GameEngine implements Runnable, IEngine{
     private GameMap map;
     private boolean isRunning;
-    public final int moveDelay = 500;
+    public final int moveDelay = 600;
     private final App app;
 
     public GameEngine(GameMap map, App app){

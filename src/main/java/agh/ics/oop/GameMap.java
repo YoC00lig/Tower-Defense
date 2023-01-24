@@ -1,11 +1,12 @@
 package agh.ics.oop;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
-public class GameMap  implements  IPositionChangeObserver{
+public class GameMap implements IPositionChangeObserver {
     public final Vector2d lowerRight;
     public final Vector2d upperLeft;
     private Castle castle;
@@ -13,15 +14,16 @@ public class GameMap  implements  IPositionChangeObserver{
     public ArrayList<Enemy> listOfEnemies = new ArrayList<>();
     public Map<Vector2d, Tower> towers = new HashMap<>();   //(upperLeft, tower)
     public ArrayList<Tower> listOfTowers = new ArrayList<>();
+    public int[] deadEnemies = {0, 0, 0};
     public static int size;
     private int spawnCountdown;
     private int initialSpawnCountdown;
-    public int  money;
+    public int money;
     private int waveIndex = 1;
     public int[][] waveSizes = {};
-    private int[][] waveVariant1 = {{10,0,0}, {8,5,0}, {5, 5, 5}, {0,10,5}};
-    private int[][] waveVariant2;
-    private int[][] waveVariant3;
+    private final int[][] waveVariant1 = {{10, 0, 0}, {8, 5, 0}, {7, 5, 3}, {7, 5, 5}, {3, 7, 5}, {0, 10, 5}};
+    private final int[][] waveVariant2 = {{10, 0, 0}, {8, 5, 0}, {5, 5, 5}, {3, 5, 5}, {10,0,6}, {4, 4, 7}, {0, 5, 8}};
+    private final int[][] waveVariant3 = {{10, 5, 0}, {10, 10, 0}, {5, 5, 5}, {5, 10, 5}, {2, 8, 8}, {2, 10, 5}, {0, 10, 10}};
     boolean floodMode;
     public ArrayList<Vector2d> cells;
 
@@ -33,33 +35,31 @@ public class GameMap  implements  IPositionChangeObserver{
         this.lowerRight = lowerRight;
         this.upperLeft = upperLeft;
         size = lowerRight.x - upperLeft.x;
-        this.initialSpawnCountdown = 20;
-        this.spawnCountdown = 20;
+        this.initialSpawnCountdown = 50;
+        this.spawnCountdown = 50;
         this.money = InitMoney;
         this.floodMode = flood;
 
         if (mapVariant == 1) {
             this.waveSizes = this.waveVariant1;
+        } else if (mapVariant == 2) {
+            this.waveSizes = this.waveVariant2;
+        } else if (mapVariant == 3) {
+            this.waveSizes = this.waveVariant3;
         }
-        else if (mapVariant == 2){
-            waveSizes = this.waveVariant1;
-        }
-//        else if (mapVariant == 2){
-//            waveSizes = this.waveVariant3;
-//        }
 
         placeCastle();
         if (flood) this.cells = generateFloodVectors();
     }
 
     private void placeCastle() {
-        Vector2d upperLeft_ = new Vector2d((lowerRight.x-10)/2, (upperLeft.y-10)/2 + 9);
-        Vector2d lowerLeft_ = new Vector2d(upperLeft_.x, upperLeft_.y-9);
-        Vector2d lowerRight_ = new Vector2d(lowerLeft_.x+9, lowerLeft_.y);
-        this.castle = new Castle(500,lowerRight_,upperLeft_);
+        Vector2d upperLeft_ = new Vector2d((lowerRight.x - 10) / 2, (upperLeft.y - 10) / 2 + 9);
+        Vector2d lowerLeft_ = new Vector2d(upperLeft_.x, upperLeft_.y - 9);
+        Vector2d lowerRight_ = new Vector2d(lowerLeft_.x + 9, lowerLeft_.y);
+        this.castle = new Castle(500, lowerRight_, upperLeft_);
     }
 
-    private int getRandomFromRange(int min, int max){
+    private int getRandomFromRange(int min, int max) {
         Random random = new Random(); // [min,max]
         return random.nextInt((max - min) + 1) + min;
     }
@@ -68,28 +68,26 @@ public class GameMap  implements  IPositionChangeObserver{
         Vector2d position;
         Random random = new Random();
         int side = random.nextInt(4);
-        position = switch (side){
-            case 0 -> new Vector2d(getRandomFromRange(upperLeft.x,lowerRight.x), lowerRight.y); // bottom
-            case 1 -> new Vector2d(upperLeft.x, getRandomFromRange(lowerRight.y,upperLeft.y)); // left
-            case 2 -> new Vector2d(getRandomFromRange(upperLeft.x,lowerRight.x), upperLeft.y); //upper
-            default -> new Vector2d(lowerRight.x, getRandomFromRange(lowerRight.y,upperLeft.y)); // right
+        position = switch (side) {
+            case 0 -> new Vector2d(getRandomFromRange(upperLeft.x, lowerRight.x), lowerRight.y); // bottom
+            case 1 -> new Vector2d(upperLeft.x, getRandomFromRange(lowerRight.y, upperLeft.y)); // left
+            case 2 -> new Vector2d(getRandomFromRange(upperLeft.x, lowerRight.x), upperLeft.y); //upper
+            default -> new Vector2d(lowerRight.x, getRandomFromRange(lowerRight.y, upperLeft.y)); // right
         };
         if (enemyVariant == 0) {
-            Enemy enemy = new Enemy(10, 1, position, this);
+            Enemy enemy = new Enemy(10, 1, position, this, 0);
             this.listOfEnemies.add(enemy);
             this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
             this.enemies.get(position).add(enemy);
             enemy.addObserver(this);
-        }
-        else if (enemyVariant == 1) {
-            Enemy enemy = new Enemy(20, 2, position, this);
+        } else if (enemyVariant == 1) {
+            Enemy enemy = new Enemy(20, 2, position, this, 1);
             this.listOfEnemies.add(enemy);
             this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
             this.enemies.get(position).add(enemy);
             enemy.addObserver(this);
-        }
-        else if (enemyVariant == 3) {
-            Enemy enemy = new Enemy(30, 2, position, this);
+        } else if (enemyVariant == 3) {
+            Enemy enemy = new Enemy(30, 2, position, this, 2);
             this.listOfEnemies.add(enemy);
             this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
             this.enemies.get(position).add(enemy);
@@ -104,18 +102,18 @@ public class GameMap  implements  IPositionChangeObserver{
         int range = tower.getRange();
         Vector2d nearestPosition = new Vector2d(0, 0);
         Enemy nearestEnemy = null;
-        for (Map.Entry<Vector2d, LinkedList<Enemy>> entry : this.enemies.entrySet()) {
-            Vector2d currPosition = entry.getKey();
+        for (Enemy enemy : listOfEnemies) {
+            Vector2d currPosition = enemy.getPosition();
             double currDist = sqrt(pow(currPosition.x - position.x, 2) + pow(currPosition.y - position.y, 2));
             if (currDist < sqrt(pow(nearestPosition.x - position.x, 2) + pow(nearestPosition.y - position.y, 2)) && currDist < range) {
                 nearestPosition = currPosition;
-                if (entry.getValue().size() > 0) nearestEnemy = entry.getValue().get(0);
+                nearestEnemy = enemy;
             }
         }
         return nearestEnemy;
     }
 
-    public boolean checkIfIsNearbyCastle(Vector2d position){
+    public boolean checkIfIsNearbyCastle(Vector2d position) {
         int startX, endX, startY, endY;
         startX = castle.getUpperLeft().x;
         endX = castle.getUpperRight().x;
@@ -128,7 +126,7 @@ public class GameMap  implements  IPositionChangeObserver{
         else return false;
     }
 
-    public boolean checkIfIsNearbyTower(Vector2d position, Tower tower){
+    public boolean checkIfIsNearbyTower(Vector2d position, Tower tower) {
         int startX, endX, startY, endY;
         startX = tower.getUpperLeft().x;
         endX = tower.getUpperRight().x;
@@ -174,7 +172,7 @@ public class GameMap  implements  IPositionChangeObserver{
 
     // sprawdzanie czy enemy stoi przy jakiejś wierzy
     public boolean isNextToTower(Vector2d position) {
-        for (Tower tower: this.listOfTowers) {
+        for (Tower tower : this.listOfTowers) {
             if (tower.isNextTo(position)) return true;
         }
         return false;
@@ -187,8 +185,8 @@ public class GameMap  implements  IPositionChangeObserver{
         int strength;
         for (Tower tower : listOfTowers) {
             Enemy nearestEnemy = findNearestEnemy(tower);
-            if (nearestEnemy != null){
-                strength = nearestEnemy.getStrength();
+            if (nearestEnemy != null) {
+                strength = tower.getStrength();
                 value = random.nextInt(5 * strength);
                 nearestEnemy.subtractHealth(value);
             }
@@ -201,6 +199,14 @@ public class GameMap  implements  IPositionChangeObserver{
         for (Enemy enemy : listOfEnemies) {
             if (enemy.getHealth() <= 0) {
                 tmp.add(enemy);
+                this.deadEnemies[enemy.getType()] += 1;
+                if (enemy.getType() == 0) {
+                    money += 50;
+                } else if (enemy.getType() == 1) {
+                    money += 70;
+                } else if (enemy.getType() == 2) {
+                    money += 100;
+                }
             }
         }
         for (Enemy enemy : tmp) {
@@ -251,7 +257,7 @@ public class GameMap  implements  IPositionChangeObserver{
         int value;
         int strength;
         Enemy enemy;
-        if (listOfTowers.size() > 0){
+        if (listOfTowers.size() > 0) {
             for (Tower tower : listOfTowers) {
                 ArrayList<Enemy> attackingEnemiesTower = findAttackingEnemiesTower(tower);
                 for (Enemy item : attackingEnemiesTower) {
@@ -278,8 +284,8 @@ public class GameMap  implements  IPositionChangeObserver{
     public void enemiesWave() {
         if (this.waveIndex < this.waveSizes.length) {  //
             if (this.spawnCountdown <= 0) {
-                for (int i = 0; i < this.waveSizes[waveIndex].length; i++){
-                    for(int j = 0; j < this.waveSizes[waveIndex][i]; j++)
+                for (int i = 0; i < this.waveSizes[waveIndex].length; i++) {
+                    for (int j = 0; j < this.waveSizes[waveIndex][i]; j++)
                         this.placeEnemy(i);
                 }
                 this.initialSpawnCountdown -= 2;
@@ -294,13 +300,14 @@ public class GameMap  implements  IPositionChangeObserver{
     public Castle getCastle() {
         return this.castle;
     }
+
     // dodawanie wieży
-    public Tower getNewTower(Vector2d upperLeft, int type){
+    public Tower getNewTower(Vector2d upperLeft, int type) {
         Vector2d low = new Vector2d(upperLeft.x, upperLeft.y - 2);
         Vector2d high = new Vector2d(upperLeft.x + 2, upperLeft.y);
         Tower tower;
-        if (type == 1) tower = new Tower(100, 1, low, high,1);
-        else tower = new Tower(100, 2, low, high,2);
+        if (type == 1) tower = new Tower(250, 5, 2, low, high, 1);
+        else tower = new Tower(300, 10, 3, low, high, 2);
         return tower;
     }
 
@@ -311,9 +318,9 @@ public class GameMap  implements  IPositionChangeObserver{
     }
 
     // poruszanie przeciwników - jeden ruch
-    public boolean buildingAt(Vector2d position){
-        if(floodMode && this.cells != null && this.cells.contains(position)) return true;
-        for (Tower tower: this.listOfTowers) { // sprawdzanie czy jakaś wieża tam nie stoi
+    public boolean buildingAt(Vector2d position) {
+        if (floodMode && this.cells != null && this.cells.contains(position)) return true;
+        for (Tower tower : this.listOfTowers) { // sprawdzanie czy jakaś wieża tam nie stoi
             Vector2d low = tower.getLowerLeft();
             Vector2d high = tower.getUpperRight();
             if (position.x >= low.x && position.x <= high.x && position.y >= low.y && position.y <= high.y) return true;
@@ -336,8 +343,9 @@ public class GameMap  implements  IPositionChangeObserver{
     public static boolean isValid(Vector2d v, GameMap map) {
         return !map.buildingAt(v) && v.x >= map.upperLeft.x && v.x <= map.lowerRight.x && v.y >= map.lowerRight.y && v.y <= map.upperLeft.y;
     }
+
     public int BFS(Vector2d s, Vector2d destination) {
-        boolean[][] visited = new boolean[this.lowerRight.x+1][this.upperLeft.y+1];
+        boolean[][] visited = new boolean[this.lowerRight.x + 1][this.upperLeft.y + 1];
         int[][] dist = new int[this.lowerRight.x + 1][this.upperLeft.y + 1];
         LinkedList<Vector2d> queue = new LinkedList<>();
         visited[s.x][s.y] = true;
@@ -374,12 +382,12 @@ public class GameMap  implements  IPositionChangeObserver{
         return -1;
     }
 
-    public IMapElement findNearestObject(Enemy enemy){
+    public IMapElement findNearestObject(Enemy enemy) {
         IMapElement object = null;
         Vector2d position = enemy.getPosition();
         int dist = Integer.MAX_VALUE;
         int tmp;
-        for (Tower tower: this.listOfTowers){
+        for (Tower tower : this.listOfTowers) {
             tmp = Math.min(BFS(position, tower.getUpperLeft()), BFS(position, tower.getLowerLeft()));
             tmp = Math.min(tmp, BFS(position, tower.getUpperRight()));
             tmp = Math.min(tmp, BFS(position, tower.getLowerRight()));
@@ -388,14 +396,14 @@ public class GameMap  implements  IPositionChangeObserver{
                 object = tower;
             }
         }
-        if (enemy.BFS(position).size() < dist){
+        if (enemy.BFS(position).size() < dist) {
             object = castle;
         }
         return object;
     }
 
-    public void moveAll(){
-        for (Enemy enemy: this.listOfEnemies){
+    public void moveAll() {
+        for (Enemy enemy : this.listOfEnemies) {
             if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition()) && !enemy.getMadeMove()) {
                 enemy.move();
                 enemy.changeMadeMove(true);
@@ -410,14 +418,14 @@ public class GameMap  implements  IPositionChangeObserver{
     }
 
     // flood mode
-    public ArrayList<Vector2d> generateFloodVectors(){
+    public ArrayList<Vector2d> generateFloodVectors() {
         int number = 100;
         ArrayList<Vector2d> cells = new ArrayList<>();
-        while (number > 0){
-            int x = (int) Math.floor(Math.random() *(this.lowerRight.x - this.upperLeft.x + 1) + this.upperLeft.x);
-            int y = (int) Math.floor(Math.random() *(this.upperLeft.y - this.lowerRight.y + 1) + this.lowerRight.y);
-            Vector2d pos = new Vector2d(x,y);
-            if (!buildingAt(pos) && !cells.contains(pos)){
+        while (number > 0) {
+            int x = (int) Math.floor(Math.random() * (this.lowerRight.x - this.upperLeft.x + 1) + this.upperLeft.x);
+            int y = (int) Math.floor(Math.random() * (this.upperLeft.y - this.lowerRight.y + 1) + this.lowerRight.y);
+            Vector2d pos = new Vector2d(x, y);
+            if (!buildingAt(pos) && !cells.contains(pos)) {
                 number -= 1;
                 cells.add(pos);
             }
@@ -426,8 +434,13 @@ public class GameMap  implements  IPositionChangeObserver{
     }
 
     public boolean checkIfCanPlaceTower(Tower tower) {
-        boolean left = !buildingAt(tower.getUpperLeft()) && !buildingAt(tower.getLowerLeft());
-        boolean right = !buildingAt(tower.getUpperRight()) && !buildingAt(tower.getLowerRight());
-        return left && right;
+        boolean flag = true;
+        for (int j = 0; j < 3; j++) {
+            for (int i = 0; i < 3; i++) {
+                flag = flag && !buildingAt(tower.getUpperLeft().add(new Vector2d(i, j)));
+            }
+        }
+        return flag;
     }
+
 }

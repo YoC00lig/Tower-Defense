@@ -115,7 +115,7 @@ public class Shop {
             if (map.checkIfCanPlaceTower(tower) && map.money - tower.getPrice() >= 0){
                 placeTowerOnMap("src/main/resources/tower.png");
                 map.money -= tower.getPrice();
-                map.addTower(tower);
+                map.addNewTower(tower);
                 stage.close();
             } else if (map.money - tower.getPrice() < 0) {
                 Label label = new Label("NOT ENOUGH MONEY");
@@ -132,7 +132,7 @@ public class Shop {
             if (map.checkIfCanPlaceTower(tower) && map.money - tower.getPrice() >= 0){
                 placeTowerOnMap("src/main/resources/tower1.png");
                 map.money -= tower.getPrice();
-                map.addTower(tower);
+                map.addNewTower(tower);
                 stage.close();
             } else if (map.money - tower.getPrice() < 0) {
                 Label label = new Label("NOT ENOUGH MONEY");

@@ -141,10 +141,15 @@ public class App extends Application {
         });
 
         m2.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 2, true);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1500, 2, true);
             floodMode = true;
             engine = new GameEngine(this.map1, this);
             Thread thread = new Thread(engine);
+            try {
+                drawMap();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
             thread.start();
         });
 

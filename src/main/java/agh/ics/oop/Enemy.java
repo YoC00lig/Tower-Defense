@@ -13,8 +13,9 @@ public class Enemy implements IMapElement {
     private int nextMove;
     private IMapElement destination;
     private boolean madeMove;
+    private int type;
 
-    public Enemy(int health, int strength, Vector2d position, GameMap map) {
+    public Enemy(int health, int strength, Vector2d position, GameMap map, int type) {
         this.health = health;
         this.strength = strength;
         this.position = position;
@@ -24,6 +25,7 @@ public class Enemy implements IMapElement {
         this.nextMove = 1;
         this.destination = map.getCastle();
         this.madeMove = false;
+        this.type = type;
     }
 
     public void subtractHealth(int value) {
@@ -54,6 +56,9 @@ public class Enemy implements IMapElement {
     }
     public void changeMadeMove(boolean x) {
         this.madeMove = x;
+    }
+    public int getType(){
+        return this.type;
     }
 
     public String toString() {

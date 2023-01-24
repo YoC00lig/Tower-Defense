@@ -5,16 +5,18 @@ public class Tower implements IMapElement{
     private Vector2d upperRight;
     private int health;
     private int range;
+    private int strength;
     public int type;
     public double maxHealth;
 
-    public Tower(int health, int range, Vector2d lowerLeft, Vector2d upperRight, int type){
+    public Tower(int health, int range, int strength, Vector2d lowerLeft, Vector2d upperRight, int type){
         this.health = health;
         this.range = range;
         this.lowerLeft = lowerLeft;
         this.upperRight = upperRight;
         this.maxHealth = health;
         this.type = type;
+        this.strength = strength;
     }
 
     public int getHealth(){
@@ -39,6 +41,10 @@ public class Tower implements IMapElement{
     }
     public void subtractHealth(int value){
         this.health -= value;
+    }
+
+    public int getStrength(){
+        return this.strength;
     }
 
     public String toString(){

@@ -26,6 +26,7 @@ public class GameMap implements IPositionChangeObserver {
     private final int[][] waveVariant3 = {{10, 5, 0}, {10, 10, 0}, {5, 5, 5}, {5, 10, 5}, {2, 8, 8}, {2, 10, 5}, {0, 10, 10}};
     boolean floodMode;
     public ArrayList<Vector2d> cells;
+    private ArrayList<Tower> newTowers = new ArrayList<>();
 
 
     public GameMap(Vector2d lowerRight, Vector2d upperLeft, int InitMoney, int mapVariant, boolean flood) {
@@ -311,10 +312,8 @@ public class GameMap implements IPositionChangeObserver {
         return tower;
     }
 
-    public void addTower(Tower tower) {
-        Vector2d upperLeft_ = tower.getUpperLeft();
-        towers.put(upperLeft_, tower);
-        listOfTowers.add(tower);
+    public void addNewTower(Tower tower) {
+        this.newTowers.add(tower);
     }
 
     // poruszanie przeciwników - jeden ruch
@@ -443,4 +442,13 @@ public class GameMap implements IPositionChangeObserver {
         return flag;
     }
 
+    public void addTowers(){
+        if (this.newTowers.size()!=0) {
+            for (Tower tower : this.newTowers) {
+                towers.put(tower.getUpperLeft(), tower);
+                listOfTowers.add(tower);
+            }
+            this.newTowers.clear();
+        }
+    }
 }

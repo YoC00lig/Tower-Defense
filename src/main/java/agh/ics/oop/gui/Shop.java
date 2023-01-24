@@ -43,10 +43,7 @@ public class Shop {
         try {
             if (!map.castleAt(new Vector2d(row,col)) && map.towerAt(new Vector2d(row, col)) == null) towerShop();
             else if (map.extendedMode && map.castleAt(new Vector2d(row,col))) cureCastle();
-            else if (map.extendedMode && map.towerAt(new Vector2d(row, col)) != null) {
-                System.out.println("tower here");
-                rangeShop(map.towerAt(new Vector2d(row, col)));
-            }
+            else if (map.extendedMode && map.towerAt(new Vector2d(row, col)) != null) rangeShop(map.towerAt(new Vector2d(row, col)));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -149,7 +146,6 @@ public class Shop {
     }
 
     public void rangeShop(Tower tower) throws FileNotFoundException{
-        System.out.println("YESSS");
         pane1 = new BorderPane();
         Label label1 = new Label("$900");
         label1.setStyle("-fx-background-color: #ffd11a;");

@@ -472,6 +472,7 @@ public class GameMap implements IPositionChangeObserver {
             for (Tower tower: this.soldTowers){
                 listOfTowers.remove(tower);
                 towers.remove(tower.getUpperLeft());
+                this.increaseMoney(tower.getCurrentPriceToSell());
             }
         }
         this.soldTowers.clear();
@@ -482,7 +483,6 @@ public class GameMap implements IPositionChangeObserver {
     }
     public void sellTower(Tower tower){
         this.soldTowers.add(tower);
-        this.increaseMoney(tower.getCurrentPriceToSell());
     }
 
     public int getWaveIndex(){

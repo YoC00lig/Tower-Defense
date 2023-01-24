@@ -30,6 +30,7 @@ public class App extends Application {
     GameEngine engine;
     Scene scene;
     boolean floodMode = false;
+    VBox box;
     Thread thread;
     Button play = drawButton();
 
@@ -131,7 +132,7 @@ public class App extends Application {
         m3.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
 
         m1.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 1, false);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 1, false, false);
             engine = new GameEngine(this.map1, this);
             thread = new Thread(engine);
             try {
@@ -142,7 +143,7 @@ public class App extends Application {
         });
 
         m2.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1500, 2, true);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1500, 2, true, false);
             floodMode = true;
             engine = new GameEngine(this.map1, this);
             thread = new Thread(engine);
@@ -154,6 +155,15 @@ public class App extends Application {
         });
 
         m3.setOnMouseClicked(event -> {
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1500, 2, false, true);
+            floodMode = true;
+            engine = new GameEngine(this.map1, this);
+            thread = new Thread(engine);
+            try {
+                drawMap();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         HBox hBox = new HBox(40, m1, m2, m3);
@@ -208,13 +218,13 @@ public class App extends Application {
     }
 
     public Button drawButton() {
-        Button startGame = new Button("Play");
+        Button startGame = new Button("PLAY");
         styleButtonHover(startGame);
         startGame.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 2em; ");
         startGame.setFont(new Font("Arial", 20));
         startGame.setAlignment(Pos.CENTER);
         styleButtonHover(startGame);
-        BorderPane.setMargin(startGame, new Insets(20,0,20,0));
+        BorderPane.setMargin(startGame, new Insets(20,0,10,0));
 
         startGame.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             thread.start();
@@ -239,6 +249,7 @@ public class App extends Application {
         GridPane.setHalignment(label, HPos.CENTER);
         gridPane.setGridLinesVisible(true);
 
+        // dodawanie wrogów, wież etc do gridpane
         for (int i = low.x; i <= high.x; i++){
             Label numberX = new Label("" + i );
             VBox box = new VBox(numberX);
@@ -303,9 +314,10 @@ public class App extends Application {
 
             VBox box = new VBox(HB, view);
             gridPane.add(box,colidx,rowidx,3,3);
+            box.setOnMouseClicked(event -> handle(gridPane, tower.getUpperLeft().x -low.x + 1, high.y - tower.getUpperLeft().y + 1,tower.getUpperLeft().y,tower.getUpperLeft().x));
             GridPane.setHalignment(view, HPos.CENTER);
         }
-
+        // dodawanie wody do gridpane w wylosowanych miejscach jeśli jest floodMode
         if (floodMode){
             for (Vector2d pos : map1.cells){
                 VBox elem = new VBox();
@@ -316,7 +328,7 @@ public class App extends Application {
                 GridPane.setHalignment(elem, HPos.CENTER);
             }
         }
-
+        // dodawanie zamku do gridpane
         Castle castle = map1.getCastle();
         Image image = new Image(new FileInputStream("src/main/resources/castle.png"));
         ImageView view = new ImageView(image);
@@ -339,20 +351,24 @@ public class App extends Application {
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setStyle("-fx-background-color: #26734d;");
 
+        // dodawanie paska z PLAY i ilością $
         Label currMoney;
         if (this.thread.isAlive()) currMoney = new Label("Your money: " + map1.money);
-        else currMoney = new Label();
+        else currMoney = new Label("Place your first towers and click PLAY, at start you have " + map1.money + "$");
+        currMoney.setFont(new Font("Arial", 15));
         currMoney.setStyle("-fx-text-fill: #ffffff;");
         HBox topBox = new HBox(currMoney,play);
         BorderPane.setAlignment(topBox, Pos.CENTER);
         topBox.setAlignment(Pos.CENTER);
         topBox.setSpacing(30);
         mainbox.setTop(topBox);
-        BorderPane.setMargin(topBox, new Insets(20,0,20,0));
+        BorderPane.setMargin(topBox, new Insets(20,0,0,0));
         BorderPane.setAlignment(topBox, Pos.CENTER);
 
-        VBox box = new VBox(castleHB, view);
+        // dodawanie całego gridpane
+        box = new VBox(castleHB, view);
         box.setAlignment(Pos.CENTER);
+        box.setOnMouseClicked(event -> handle(gridPane, castle.getUpperLeft().x -low.x + 1, high.y - castle.getUpperLeft().y + 1,castle.getUpperLeft().y,castle.getUpperLeft().x));
         gridPane.add(box,  castle.getUpperLeft().x -low.x + 1, high.y - castle.getUpperLeft().y + 1,10,10);
         mainbox.setCenter(gridPane);
         BorderPane.setAlignment(gridPane, Pos.CENTER);
@@ -368,7 +384,7 @@ public class App extends Application {
         Stage stageShop = new Stage();
         stageShop.setTitle("Shop");
         Shop shop = new Shop(stageShop, gridPane, colIndex, rowIndex, col, row, map1,stage);
-        Scene shopping = new Scene(shop.getVB(), 400, 400);
+        Scene shopping = new Scene(shop.getHB(), 400, 400);
         stageShop.setResizable(false);
         stageShop.setScene(shopping);
         stageShop.show();

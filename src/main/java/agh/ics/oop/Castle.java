@@ -47,4 +47,8 @@ public class Castle implements IMapElement{
     public Vector2d getPosition(){
         return this.upperLeft;
     }
+
+    public void heal(){
+        this.health = (int) maxHealth;
+    }
 }

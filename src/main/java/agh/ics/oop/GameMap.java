@@ -33,8 +33,8 @@ public class GameMap  implements  IPositionChangeObserver{
         this.lowerRight = lowerRight;
         this.upperLeft = upperLeft;
         size = lowerRight.x - upperLeft.x;
-        this.initialSpawnCountdown = 10;
-        this.spawnCountdown = 10;
+        this.initialSpawnCountdown = 20;
+        this.spawnCountdown = 20;
         this.money = InitMoney;
         this.floodMode = flood;
 
@@ -129,6 +129,19 @@ public class GameMap  implements  IPositionChangeObserver{
         else return false;
     }
 
+    public boolean checkIfIsNearbyTower(Vector2d position, Tower tower){
+        int startX, endX, startY, endY;
+        startX = tower.getUpperLeft().x;
+        endX = tower.getUpperRight().x;
+        startY = tower.getLowerLeft().y;
+        endY = tower.getUpperLeft().y;
+        if (position.x == startX - 1 && position.y <= endY && position.y >= startY) return true;
+        else if (position.x == endX + 1 && position.y <= endY && position.y >= startY) return true;
+        else if (position.y == startY - 1 && position.x >= startX && position.x <= endX) return true;
+        else if (position.y == endY + 1 && position.x >= startX && position.x <= endX) return true;
+        else return false;
+    }
+
     // szukanie wrogów, którzy stoją przy zamku
     public ArrayList<Enemy> findAttackingEnemies() {
         ArrayList<Enemy> attackingEnemies = new ArrayList<>();
@@ -147,7 +160,7 @@ public class GameMap  implements  IPositionChangeObserver{
         ArrayList<Enemy> attackingEnemiesTower = new ArrayList<>();
         for (Map.Entry<Vector2d, LinkedList<Enemy>> entry : this.enemies.entrySet()) {
             Vector2d position = entry.getKey();
-            boolean flag = checkIfIsNearbyCastle(position);
+            boolean flag = checkIfIsNearbyTower(position, tower);
             if (flag) {
                 attackingEnemiesTower.addAll(entry.getValue());
             }
@@ -230,7 +243,6 @@ public class GameMap  implements  IPositionChangeObserver{
                 castle.subtractHealth(value);
                 enemy.changeMadeHit(true);
             }
-
         }
     }
 
@@ -391,10 +403,20 @@ public class GameMap  implements  IPositionChangeObserver{
     public void moveAll(){
         for (LinkedList<Enemy> list: enemies.values()){
             for (Enemy enemy: list) {
-                if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition())) enemy.move();
+                if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition()) && !enemy.getMadeMove()) {
+                    enemy.move();
+                    enemy.changeMadeMove(true);
+                }
             }
         }
     }
+
+    public void removeMoves() {
+        for (Enemy enemy : listOfEnemies) {
+            enemy.changeMadeMove(false);
+        }
+    }
+
     // flood mode
     public ArrayList<Vector2d> generateFloodVectors(){
         int number = 100;

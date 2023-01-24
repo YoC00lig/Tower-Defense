@@ -57,7 +57,7 @@ public class GameMap implements IPositionChangeObserver {
         Vector2d upperLeft_ = new Vector2d((lowerRight.x - 10) / 2, (upperLeft.y - 10) / 2 + 9);
         Vector2d lowerLeft_ = new Vector2d(upperLeft_.x, upperLeft_.y - 9);
         Vector2d lowerRight_ = new Vector2d(lowerLeft_.x + 9, lowerLeft_.y);
-        this.castle = new Castle(500, lowerRight_, upperLeft_);
+        this.castle = new Castle(100, lowerRight_, upperLeft_);
     }
 
     private int getRandomFromRange(int min, int max) {
@@ -451,4 +451,12 @@ public class GameMap implements IPositionChangeObserver {
             this.newTowers.clear();
         }
     }
+
+    public int getWaveIndex(){
+        return this.waveIndex;
+    }
+    public int[] getDeadEnemies(){
+        return this.deadEnemies;
+    }
+
 }

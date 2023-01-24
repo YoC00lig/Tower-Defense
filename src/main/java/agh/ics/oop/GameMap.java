@@ -27,6 +27,7 @@ public class GameMap implements IPositionChangeObserver {
     boolean floodMode;
     public ArrayList<Vector2d> cells = new ArrayList<>();
     private ArrayList<Tower> newTowers = new ArrayList<>();
+    private ArrayList<Tower> soldTowers = new ArrayList<>();
     public boolean extendedMode;
 
 
@@ -43,13 +44,9 @@ public class GameMap implements IPositionChangeObserver {
         this.floodMode = flood;
         this.extendedMode = extended;
 
-        if (mapVariant == 1) {
-            this.waveSizes = this.waveVariant1;
-        } else if (mapVariant == 2) {
-            this.waveSizes = this.waveVariant2;
-        } else if (mapVariant == 3) {
-            this.waveSizes = this.waveVariant3;
-        }
+        if (mapVariant == 1) this.waveSizes = this.waveVariant1;
+        else if (mapVariant == 2) this.waveSizes = this.waveVariant2;
+        else if (mapVariant == 3) this.waveSizes = this.waveVariant3;
 
         placeCastle();
         if (flood) this.cells = generateFloodVectors();
@@ -153,7 +150,7 @@ public class GameMap implements IPositionChangeObserver {
         return attackingEnemies;
     }
 
-    // szukanie wrogów, którzy stoją przy wierzy
+    // szukanie wrogów, którzy stoją przy wieży
     public ArrayList<Enemy> findAttackingEnemiesTower(Tower tower) {
         ArrayList<Enemy> attackingEnemiesTower = new ArrayList<>();
         for (Map.Entry<Vector2d, LinkedList<Enemy>> entry : this.enemies.entrySet()) {
@@ -452,7 +449,7 @@ public class GameMap implements IPositionChangeObserver {
             this.newTowers.clear();
         }
     }
-
+    // potrzebne do gui/Shop
     public boolean castleAt(Vector2d v){
         for (int row = castle.getLowerLeft().x; row <= castle.getLowerRight().x; row++){
             for (int col = castle.getLowerLeft().y; col <= castle.getUpperLeft().y; col++){
@@ -467,6 +464,25 @@ public class GameMap implements IPositionChangeObserver {
             if (v.equals(tower.getUpperLeft())) return tower;
         }
         return null;
+    }
+    
+    // sprzedawanie wież
+    public void sellTowers(){
+        if (this.soldTowers.size() > 0){
+            for (Tower tower: this.soldTowers){
+                listOfTowers.remove(tower);
+                towers.remove(tower.getUpperLeft());
+            }
+        }
+        this.soldTowers.clear();
+    }
+
+    public void increaseMoney(int value){
+        this.money += value;
+    }
+    public void sellTower(Tower tower){
+        this.soldTowers.add(tower);
+        this.increaseMoney(tower.getCurrentPriceToSell());
     }
 
     public int getWaveIndex(){

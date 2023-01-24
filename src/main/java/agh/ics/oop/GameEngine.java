@@ -22,6 +22,7 @@ public class GameEngine implements Runnable, IEngine{
     }
 
     public void updateMap(){
+        map.sellTowers();
         map.addTowers();
         map.moveAll();   // ruch wrogów
         map.attackCastle();  // atak wrogów na zamek

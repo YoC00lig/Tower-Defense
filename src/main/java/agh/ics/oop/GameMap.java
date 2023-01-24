@@ -41,13 +41,12 @@ public class GameMap  implements  IPositionChangeObserver{
         if (mapVariant == 1) {
             this.waveSizes = this.waveVariant1;
         }
-        /*
-        else if (mapVariant == 1){
-            waveSizes = this.waveVariant2;
-        }
         else if (mapVariant == 2){
-            waveSizes = this.waveVariant3;
-        }*/
+            waveSizes = this.waveVariant1;
+        }
+//        else if (mapVariant == 2){
+//            waveSizes = this.waveVariant3;
+//        }
 
         placeCastle();
         if (flood) this.cells = generateFloodVectors();
@@ -310,16 +309,11 @@ public class GameMap  implements  IPositionChangeObserver{
         towers.put(upperLeft_, tower);
         listOfTowers.add(tower);
     }
-    public boolean checkIfCanPlaceTower(Tower tower) {
-        boolean left = !buildingAt(tower.getUpperLeft()) && !buildingAt(tower.getLowerLeft());
-        boolean right = !buildingAt(tower.getUpperRight()) && !buildingAt(tower.getLowerRight());
-        return left && right;
-    }
 
     // poruszanie przeciwników - jeden ruch
     public boolean buildingAt(Vector2d position){
         if(floodMode && this.cells != null && this.cells.contains(position)) return true;
-        for (Tower tower: towers.values()) { // sprawdzanie czy jakaś wieża tam nie stoi
+        for (Tower tower: this.listOfTowers) { // sprawdzanie czy jakaś wieża tam nie stoi
             Vector2d low = tower.getLowerLeft();
             Vector2d high = tower.getUpperRight();
             if (position.x >= low.x && position.x <= high.x && position.y >= low.y && position.y <= high.y) return true;
@@ -401,12 +395,10 @@ public class GameMap  implements  IPositionChangeObserver{
     }
 
     public void moveAll(){
-        for (LinkedList<Enemy> list: enemies.values()){
-            for (Enemy enemy: list) {
-                if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition()) && !enemy.getMadeMove()) {
-                    enemy.move();
-                    enemy.changeMadeMove(true);
-                }
+        for (Enemy enemy: this.listOfEnemies){
+            if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition()) && !enemy.getMadeMove()) {
+                enemy.move();
+                enemy.changeMadeMove(true);
             }
         }
     }
@@ -431,5 +423,11 @@ public class GameMap  implements  IPositionChangeObserver{
             }
         }
         return cells;
+    }
+
+    public boolean checkIfCanPlaceTower(Tower tower) {
+        boolean left = !buildingAt(tower.getUpperLeft()) && !buildingAt(tower.getLowerLeft());
+        boolean right = !buildingAt(tower.getUpperRight()) && !buildingAt(tower.getLowerRight());
+        return left && right;
     }
 }

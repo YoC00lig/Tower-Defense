@@ -153,7 +153,7 @@ public class Enemy implements IMapElement {
             positionChanged(this.position, newPosition);
             this.position = newPosition;
             this.nextMove += 1;
-        } else {
+        } else if (this.nextMove < this.steps.size()) {
             Vector2d newPosition = steps.get(this.nextMove);
             positionChanged(this.position, newPosition);
             this.position = newPosition;

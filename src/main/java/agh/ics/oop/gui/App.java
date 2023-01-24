@@ -90,6 +90,7 @@ public class App extends Application {
         styleButtonHover(start);
         start.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 2em; ");
 
+
         BorderPane.setAlignment(welcomeLabel,Pos.CENTER);
         BorderPane.setAlignment(start,Pos.CENTER);
         BorderPane.setAlignment(pictures,Pos.CENTER);

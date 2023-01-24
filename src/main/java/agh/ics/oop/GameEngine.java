@@ -12,6 +12,7 @@ public class GameEngine implements Runnable, IEngine{
     public GameEngine(GameMap map, App app){
         this.map = map;
         this.app =  app;
+
         this.isRunning = true;
 
         for (int i = 0; i < map.waveSizes[0].length; i++){

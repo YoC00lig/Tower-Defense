@@ -427,6 +427,7 @@ public class GameMap implements IPositionChangeObserver {
             if (!buildingAt(pos) && !cells.contains(pos)) {
                 number -= 1;
                 cells.add(pos);
+
             }
         }
         return cells;

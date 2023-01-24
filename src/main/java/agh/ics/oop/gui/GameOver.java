@@ -32,6 +32,7 @@ public class GameOver {
         this.stage.initOwner(primaryStage);
         this.application = application;
         create();
+
     }
 
     private void create() {

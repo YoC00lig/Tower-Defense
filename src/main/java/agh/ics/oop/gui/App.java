@@ -129,14 +129,14 @@ public class App extends Application {
         m3.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
 
         m1.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 0, false);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 1, false);
             engine = new GameEngine(this.map1, this);
             Thread thread = new Thread(engine);
             thread.start();
         });
 
         m2.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 0, true);
+            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 2, true);
             floodMode = true;
             engine = new GameEngine(this.map1, this);
             Thread thread = new Thread(engine);

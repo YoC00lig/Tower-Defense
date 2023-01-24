@@ -427,6 +427,7 @@ public class GameMap implements IPositionChangeObserver {
             if (!buildingAt(pos) && !cells.contains(pos)) {
                 number -= 1;
                 cells.add(pos);
+
             }
         }
         return cells;
@@ -467,4 +468,12 @@ public class GameMap implements IPositionChangeObserver {
         }
         return null;
     }
+
+    public int getWaveIndex(){
+        return this.waveIndex;
+    }
+    public int[] getDeadEnemies(){
+        return this.deadEnemies;
+    }
+
 }

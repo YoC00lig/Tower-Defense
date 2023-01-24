@@ -442,4 +442,5 @@ public class GameMap implements IPositionChangeObserver {
         }
         return flag;
     }
+
 }

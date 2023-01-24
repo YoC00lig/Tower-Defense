@@ -23,7 +23,7 @@ public class Shop {
     Button btn1, btn2;
     Stage stage;
     GridPane grid;
-    int rowidx,colidx; // indeksy na gridPane
+    int rowidx, colidx; // indeksy na gridPane
     int col, row; // prawdziwe indeksy
     GameMap map;
     BorderPane pane1, pane2;

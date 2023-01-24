@@ -37,6 +37,7 @@ public class GameMap  implements  IPositionChangeObserver{
         this.spawnCountdown = 10;
         this.money = InitMoney;
         this.floodMode = flood;
+
         if (mapVariant == 1) {
             this.waveSizes = this.waveVariant1;
         }

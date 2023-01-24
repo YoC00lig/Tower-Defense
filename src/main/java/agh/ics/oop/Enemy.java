@@ -85,9 +85,7 @@ public class Enemy implements IMapElement{
 
         while (queue.size() != 0) {
             p = queue.poll();
-            if (map.isNextToCastle(p) || map.isNextToTower(p)) {
-                return backtrace(s, p, parents);
-            }
+            if (map.isNextToCastle(p) || map.isNextToTower(p)) return backtrace(s, p, parents);
 
             ArrayList<Vector2d> next_vectors = new ArrayList<>();
             int x = p.x;
@@ -140,13 +138,12 @@ public class Enemy implements IMapElement{
             Vector2d newPosition = steps.get(this.nextMove);
             positionChanged(this.position, newPosition);
             this.position = newPosition;
-            this.nextMove += 1;
         }
         else{
             Vector2d newPosition = steps.get(this.nextMove);
             positionChanged(this.position, newPosition);
             this.position = newPosition;
-            this.nextMove += 1;
         }
+        this.nextMove += 1;
     }
 }

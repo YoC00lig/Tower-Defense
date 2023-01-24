@@ -61,8 +61,6 @@ public class GameEngine implements Runnable, IEngine{
             }
         }
         Thread.interrupted();
-        //System.exit(0);
-        //app.stage.close();
     }
 
 }

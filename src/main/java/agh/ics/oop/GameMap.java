@@ -25,11 +25,12 @@ public class GameMap implements IPositionChangeObserver {
     private final int[][] waveVariant2 = {{10, 0, 0}, {8, 5, 0}, {5, 5, 5}, {3, 5, 5}, {10,0,6}, {4, 4, 7}, {0, 5, 8}};
     private final int[][] waveVariant3 = {{10, 5, 0}, {10, 10, 0}, {5, 5, 5}, {5, 10, 5}, {2, 8, 8}, {2, 10, 5}, {0, 10, 10}};
     boolean floodMode;
-    public ArrayList<Vector2d> cells;
+    public ArrayList<Vector2d> cells = new ArrayList<>();
     private ArrayList<Tower> newTowers = new ArrayList<>();
+    public boolean extendedMode;
 
 
-    public GameMap(Vector2d lowerRight, Vector2d upperLeft, int InitMoney, int mapVariant, boolean flood) {
+    public GameMap(Vector2d lowerRight, Vector2d upperLeft, int InitMoney, int mapVariant, boolean flood, boolean extended) {
         if ((Math.abs(lowerRight.x - upperLeft.x) <= 10) || (Math.abs(lowerRight.y - upperLeft.y) <= 10)) {
             throw new IllegalArgumentException("Incorrect map coordinates, map must be bigger.");
         }
@@ -40,6 +41,7 @@ public class GameMap implements IPositionChangeObserver {
         this.spawnCountdown = 50;
         this.money = InitMoney;
         this.floodMode = flood;
+        this.extendedMode = extended;
 
         if (mapVariant == 1) {
             this.waveSizes = this.waveVariant1;
@@ -123,8 +125,7 @@ public class GameMap implements IPositionChangeObserver {
         if (position.x == startX - 1 && position.y <= endY && position.y >= startY) return true;
         else if (position.x == endX + 1 && position.y <= endY && position.y >= startY) return true;
         else if (position.y == startY - 1 && position.x >= startX && position.x <= endX) return true;
-        else if (position.y == endY + 1 && position.x >= startX && position.x <= endX) return true;
-        else return false;
+        else return position.y == endY + 1 && position.x >= startX && position.x <= endX;
     }
 
     public boolean checkIfIsNearbyTower(Vector2d position, Tower tower) {
@@ -136,8 +137,7 @@ public class GameMap implements IPositionChangeObserver {
         if (position.x == startX - 1 && position.y <= endY && position.y >= startY) return true;
         else if (position.x == endX + 1 && position.y <= endY && position.y >= startY) return true;
         else if (position.y == startY - 1 && position.x >= startX && position.x <= endX) return true;
-        else if (position.y == endY + 1 && position.x >= startX && position.x <= endX) return true;
-        else return false;
+        else return position.y == endY + 1 && position.x >= startX && position.x <= endX;
     }
 
     // szukanie wrogów, którzy stoją przy zamku
@@ -450,5 +450,21 @@ public class GameMap implements IPositionChangeObserver {
             }
             this.newTowers.clear();
         }
+    }
+
+    public boolean castleAt(Vector2d v){
+        for (int row = castle.getLowerLeft().x; row <= castle.getLowerRight().x; row++){
+            for (int col = castle.getLowerLeft().y; col <= castle.getUpperLeft().y; col++){
+                if (v.equals(new Vector2d(row,col))) return true;
+            }
+        }
+        return false;
+    }
+
+    public Tower towerAt(Vector2d v){
+        for (Tower tower: this.listOfTowers){
+            if (v.equals(tower.getUpperLeft())) return tower;
+        }
+        return null;
     }
 }

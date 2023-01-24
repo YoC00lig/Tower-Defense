@@ -56,10 +56,6 @@ public class Tower implements IMapElement{
         else return 700;
     }
 
-//    public boolean isAt(Vector2d pos) {
-//        return pos == this.upperRight || pos == this.lowerLeft || pos == this.getUpperLeft() || pos == this.getLowerRight();
-//    }
-
     public boolean isNextTo(Vector2d position){
         boolean left = position.x == this.getLowerLeft().x - 1 && position.y >= this.getLowerLeft().y && position.y <= getUpperLeft().y;
         boolean right = position.x == this.getLowerRight().x + 1 && position.y >= this.getLowerLeft().y && position.y <= getUpperLeft().y;
@@ -70,6 +66,10 @@ public class Tower implements IMapElement{
     public String getPath(IMapElement object) {
         if (this.type ==1 ) return "src/main/resources/tower.png";
         else return "src/main/resources/tower1.png";
+    }
+
+    public void addRange(){
+        this.range += 1;
     }
 
     public Vector2d getPosition() {

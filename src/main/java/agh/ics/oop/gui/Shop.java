@@ -20,7 +20,7 @@ import javafx.stage.*;
 
 public class Shop {
     HBox box;
-    Button btn1, btn2;
+    Button btn1, btn2, btn3;
     Stage stage;
     GridPane grid;
     int rowidx, colidx; // indeksy na gridPane
@@ -39,16 +39,19 @@ public class Shop {
         this.stage.setAlwaysOnTop(true);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initOwner(primaryStage);
-        stage.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-            if (!isNowFocused) stage.hide();
-        });
+        stage.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {if (!isNowFocused) stage.hide();});
         try {
-            create();
+            if (!map.castleAt(new Vector2d(row,col)) && map.towerAt(new Vector2d(row, col)) == null) towerShop();
+            else if (map.extendedMode && map.castleAt(new Vector2d(row,col))) cureCastle();
+            else if (map.extendedMode && map.towerAt(new Vector2d(row, col)) != null) {
+                System.out.println("tower here");
+                rangeShop(map.towerAt(new Vector2d(row, col)));
+            }
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
-    public void create() throws FileNotFoundException{
+    public void towerShop() throws FileNotFoundException{
         pane1 = new BorderPane();
         Label label1 = new Label("$300");
         label1.setStyle("-fx-background-color: #ffd11a;");
@@ -91,7 +94,7 @@ public class Shop {
         box.setStyle("-fx-background-color: #1f2e2e;");
     }
 
-    public HBox getVB() {
+    public HBox getHB() {
         return this.box;
     }
 
@@ -109,6 +112,78 @@ public class Shop {
         this.grid.add(view,this.colidx,this.rowidx,3,3);
         stage.close();
     }
+
+    public void cureCastle() throws FileNotFoundException{
+        pane1 = new BorderPane();
+        Label label1 = new Label("$1000");
+        label1.setStyle("-fx-background-color: #ffd11a;");
+        pane1.setTop(label1);
+        Image image1 = new Image(new FileInputStream("src/main/resources/heart.png"));
+        ImageView view1 = new ImageView(image1);
+        view1.setFitWidth(200);
+        view1.setFitHeight(150);
+        btn3 = new Button("BUY");
+        pane1.setCenter(view1);
+        pane1.setBottom(btn3);
+        BorderPane.setAlignment(label1, Pos.CENTER);
+        BorderPane.setAlignment(view1, Pos.CENTER);
+        BorderPane.setAlignment(btn3, Pos.CENTER);
+        BorderPane.setMargin(btn3, new Insets(0,0,40,0));
+        BorderPane.setMargin(label1, new Insets(40,0,0,0));
+        box = new HBox(pane1);
+        box.setMinHeight(300);
+        box.setMinWidth(200);
+        box.setStyle("-fx-background-color: #1f2e2e;");
+        box.setAlignment(Pos.CENTER);
+        styleButtonHover(btn3);
+        btn3.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if (this.map.money - 1000 >= 0) {
+                this.map.getCastle().heal();
+                map.money -= 1000;
+                stage.close();
+            }
+            else {
+                stage.close();
+            }
+        });
+    }
+
+    public void rangeShop(Tower tower) throws FileNotFoundException{
+        System.out.println("YESSS");
+        pane1 = new BorderPane();
+        Label label1 = new Label("$900");
+        label1.setStyle("-fx-background-color: #ffd11a;");
+        pane1.setTop(label1);
+        Image image1 = new Image(new FileInputStream("src/main/resources/boom.png"));
+        ImageView view1 = new ImageView(image1);
+        view1.setFitWidth(200);
+        view1.setFitHeight(150);
+        btn3 = new Button("BUY");
+        pane1.setCenter(view1);
+        pane1.setBottom(btn3);
+        BorderPane.setAlignment(label1, Pos.CENTER);
+        BorderPane.setAlignment(view1, Pos.CENTER);
+        BorderPane.setAlignment(btn3, Pos.CENTER);
+        BorderPane.setMargin(btn3, new Insets(0,0,40,0));
+        BorderPane.setMargin(label1, new Insets(40,0,0,0));
+        box = new HBox(pane1);
+        box.setMinHeight(300);
+        box.setMinWidth(200);
+        box.setStyle("-fx-background-color: #1f2e2e;");
+        box.setAlignment(Pos.CENTER);
+        styleButtonHover(btn3);
+        btn3.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if (this.map.money - 900 >= 0) {
+                map.money -= 900;
+                tower.addRange();
+                stage.close();
+            }
+            else {
+                stage.close();
+            }
+        });
+    }
+
     public void styleButtons() { // Event listenery dla guzików BUY, żeby dodawać wieżę na mapę i do tablicy towers w GameMap
         btn1.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             Tower tower = map.getNewTower(new Vector2d(row, col), 1);

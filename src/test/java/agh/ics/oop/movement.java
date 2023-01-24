@@ -8,7 +8,7 @@ public class movement {
 
     @Test
     public void Test1(){
-        GameMap map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 1, false);
+        GameMap map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 1, false, false);
         for (int i = 0; i < map1.waveSizes[0].length; i++){
             for(int j = 0; j < map1.waveSizes[0][i]; j++)
                 map1.placeEnemy(i);
@@ -43,7 +43,7 @@ public class movement {
     }
 
     @Test public void Test2() {
-        GameMap map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 1, false);
+        GameMap map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 1, false, false);
         for (int i = 0; i < map1.waveSizes[0].length; i++){
             for(int j = 0; j < map1.waveSizes[0][i]; j++)
                 map1.placeEnemy(i);

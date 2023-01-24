@@ -8,6 +8,7 @@ public class GameEngine implements Runnable, IEngine{
     private boolean isRunning;
     public final int moveDelay = 300;
     private final App app;
+
     public GameEngine(GameMap map, App app){
         this.map = map;
         this.app =  app;

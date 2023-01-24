@@ -87,7 +87,7 @@ public class GameMap implements IPositionChangeObserver {
             this.enemies.computeIfAbsent(position, k -> new LinkedList<>());
             this.enemies.get(position).add(enemy);
             enemy.addObserver(this);
-        } else if (enemyVariant == 3) {
+        } else if (enemyVariant == 2) {
             Enemy enemy = new Enemy(30, 2, position, this, 2);
             this.listOfEnemies.add(enemy);
             this.enemies.computeIfAbsent(position, k -> new LinkedList<>());

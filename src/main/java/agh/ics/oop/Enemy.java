@@ -67,7 +67,9 @@ public class Enemy implements IMapElement {
 
     @Override
     public String getPath(IMapElement object) {
-        return "src/main/resources/archer1.png";
+        if (this.getType() == 0)  return "src/main/resources/enemy1.png";
+        else if (this.getType() == 1)  return "src/main/resources/enemy2.png";
+        else return "src/main/resources/enemy3.png";
     }
 
     public static boolean isValid(Vector2d v, GameMap map) {

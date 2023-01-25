@@ -293,6 +293,14 @@ public class App extends Application {
             }
         }
 
+        for (Wall element : map1.walls){
+            GuiElementBox guiElement = new GuiElementBox(element, 20);
+            VBox elem = guiElement.getvBox();
+            Vector2d pos = element.getPosition();
+            gridPane.add(elem,  pos.x - low.x + 1, high.y - pos.y + 1);
+            GridPane.setHalignment(elem, HPos.CENTER);
+        }
+
         for (Tower tower: map1.listOfTowers){
             String path = tower.getPath(tower);
             Vector2d pos = tower.getUpperLeft();
@@ -391,12 +399,18 @@ public class App extends Application {
 
     public void handle(GridPane gridPane, int colIndex, int rowIndex, int col, int row) { // otwiera się okno ze sklepem
         Stage stageShop = new Stage();
-        stageShop.setTitle("Shop");
-        Shop shop = new Shop(stageShop, gridPane, colIndex, rowIndex, col, row, map1,stage);
-        Scene shopping = new Scene(shop.getHB(), 400, 400);
-        stageShop.setResizable(false);
-        stageShop.setScene(shopping);
-        stageShop.show();
+        if (map1.startWall == null) {
+            Shop shop = new Shop(stageShop, gridPane, colIndex, rowIndex, col, row, map1, stage);
+            stageShop.setTitle("Shop");
+            Scene shopping = new Scene(shop.getHB(), 600, 400);
+            stageShop.setResizable(false);
+            stageShop.setScene(shopping);
+            stageShop.show();
+        }
+        else {
+            placeWall(row, col);
+            map1.setWallStart(null);
+        }
     }
 
     public void drawGameOver(String string){
@@ -418,6 +432,82 @@ public class App extends Application {
     public void styleButtonHover(Button B) {
         B.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> B.setEffect(new DropShadow()));
         B.addEventHandler(MouseEvent.MOUSE_EXITED, e -> B.setEffect(null));
+    }
+
+    public void placeWall(int row, int col) {
+        Vector2d low = new Vector2d(map1.upperLeft.x, map1.lowerRight.y);
+        Vector2d high = new Vector2d(map1.lowerRight.x, map1.upperLeft.y);
+        Vector2d start = map1.startWall;
+        Vector2d end = new Vector2d(row, col);
+        ArrayList<Vector2d> walls = BFS(start, end);
+        for (Vector2d v: walls){
+            if (map1.money - 100 >= 0){
+                map1.addWall(v);
+                map1.money -= 100;
+            }
+        }
+        for (Wall element: map1.newWalls){
+            GuiElementBox guiElement = new GuiElementBox(element, 20);
+            VBox elem = guiElement.getvBox();
+            Vector2d pos = element.getPosition();
+            this.gridPane.add(elem,  pos.x - low.x + 1, high.y - pos.y + 1);
+            GridPane.setHalignment(elem, HPos.CENTER);
+        }
+    }
+
+    public static boolean isValid(Vector2d v, GameMap map) {
+        return !map.buildingAt(v) && v.x >= map.upperLeft.x && v.x <= map.lowerRight.x && v.y >= map.lowerRight.y && v.y <= map.upperLeft.y;
+    }
+
+    private ArrayList<Vector2d> backtrace(Vector2d start, Vector2d end, Map<Vector2d, Vector2d> parents) {
+        ArrayList<Vector2d> result = new ArrayList<>();
+        result.add(end);
+        Vector2d prev = parents.get(end);
+        Vector2d new_prev;
+        while (!(prev == start)) {
+            result.add(prev);
+            new_prev = parents.get(prev);
+            prev = new_prev;
+        }
+        result.add(start);
+        Collections.reverse(result);
+        return result;
+    }
+
+    public ArrayList<Vector2d> BFS(Vector2d s, Vector2d e) {
+        boolean[][] visited = new boolean[70][40];
+        Map<Vector2d, Vector2d> parents = new HashMap<>();
+        LinkedList<Vector2d> queue = new LinkedList<>();
+        visited[s.x][s.y] = true;
+        queue.add(s);
+        Vector2d p;
+
+        while (queue.size() != 0) {
+            p = queue.poll();
+            if (p.equals(e)) return backtrace(s,p,parents);
+
+            ArrayList<Vector2d> next_vectors = new ArrayList<>();
+            int x = p.x;
+            int y = p.y;
+            next_vectors.add(new Vector2d(x, y - 1));
+            next_vectors.add(new Vector2d(x, y + 1));
+            next_vectors.add(new Vector2d(x - 1, y));
+            next_vectors.add(new Vector2d(x + 1, y));
+
+            Collections.shuffle(next_vectors);
+
+            for (Vector2d next_step : next_vectors) {
+                int nx = next_step.x;
+                int ny = next_step.y;
+
+                if (isValid(next_step, map1) && !visited[nx][ny]) {
+                    visited[nx][ny] = true;
+                    parents.put(next_step, p);
+                    queue.add(next_step);
+                }
+            }
+        }
+        return new ArrayList<>();
     }
 
     public void draw() throws FileNotFoundException {

@@ -3,6 +3,8 @@ package agh.ics.oop.gui;
 import agh.ics.oop.GameMap;
 import agh.ics.oop.Tower;
 import agh.ics.oop.Vector2d;
+import agh.ics.oop.Wall;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -16,17 +18,20 @@ import javafx.scene.layout.HBox;
 import javafx.scene.effect.DropShadow;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.*;
+
+import javafx.scene.layout.VBox;
 import javafx.stage.*;
 
 public class Shop {
-    HBox box;
+    HBox box = new HBox();
     Button btn1, btn2, btn3;
     Stage stage;
     GridPane grid;
     int rowidx, colidx; // indeksy na gridPane
     int col, row; // prawdziwe indeksy
     GameMap map;
-    BorderPane pane1, pane2;
+    BorderPane pane1, pane2, pane3;
 
     public Shop(Stage stage, GridPane gird, int colidx, int rowidx, int col, int row, GameMap map, Stage primaryStage) {
         this.stage = stage;
@@ -83,11 +88,28 @@ public class Shop {
         BorderPane.setMargin(btn2, new Insets(0,0,40,0));
         BorderPane.setMargin(label2, new Insets(40,0,0,0));
 
+        pane3 = new BorderPane();
+        Label label3 = new Label("$100");
+        label3.setStyle("-fx-background-color: #ffd11a;");
+        pane3.setTop(label3);
+        Image image3 = new Image(new FileInputStream("src/main/resources/wall.png"));
+        ImageView view3 = new ImageView(image3);
+        view3.setFitWidth(150);
+        view3.setFitHeight(150);
+        btn3 = new Button("BUY");
+        pane3.setCenter(view3);
+        pane3.setBottom(btn3);
+        BorderPane.setAlignment(label3, Pos.CENTER);
+        BorderPane.setAlignment(view3, Pos.CENTER);
+        BorderPane.setAlignment(btn3, Pos.CENTER);
+        BorderPane.setMargin(btn3, new Insets(0,0,40,0));
+        BorderPane.setMargin(label3, new Insets(40,0,0,0));
+
         styleButtons();
 
-        box = new HBox(pane1, pane2);
+        box = new HBox(pane1, pane2, pane3);
         box.setMinHeight(300);
-        box.setMinWidth(400);
+        box.setMinWidth(600);
         box.setStyle("-fx-background-color: #1f2e2e;");
     }
 
@@ -239,12 +261,22 @@ public class Shop {
                 stage.close();
             }
         });
+
+        btn3.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if (map.startWall == null){
+                map.setWallStart(new Vector2d(this.row, this.col));
+                stage.close();
+            }
+        });
+
         styleButtonHover(btn1);
         styleButtonHover(btn2);
+        styleButtonHover(btn3);
     }
 
     public void styleButtonHover(Button B) {
         B.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> B.setEffect(new DropShadow()));
         B.addEventHandler(MouseEvent.MOUSE_EXITED, e -> B.setEffect(null));
     }
+
 }

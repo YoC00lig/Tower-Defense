@@ -1,6 +1,8 @@
 package agh.ics.oop;
 
-public class Wall {
+import java.util.*;
+
+public class Wall implements IMapElement{
     Vector2d position;
     private int health;
 
@@ -22,5 +24,11 @@ public class Wall {
 
     public String toString(){
         return "w";
+    }
+    public String getPath(IMapElement object) {
+        return "src/main/resources/wall.png";
+    }
+    public int getPrice() {
+        return 100;
     }
 }

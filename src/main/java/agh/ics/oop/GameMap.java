@@ -28,7 +28,10 @@ public class GameMap implements IPositionChangeObserver {
     public ArrayList<Vector2d> cells = new ArrayList<>();
     private ArrayList<Tower> newTowers = new ArrayList<>();
     private ArrayList<Tower> soldTowers = new ArrayList<>();
+    public ArrayList<Wall> newWalls = new ArrayList<>();
+    public ArrayList<Wall> walls = new ArrayList<>();
     public boolean extendedMode;
+    public Vector2d startWall=null;
 
 
     public GameMap(Vector2d lowerRight, Vector2d upperLeft, int InitMoney, int mapVariant, boolean flood, boolean extended) {
@@ -161,6 +164,18 @@ public class GameMap implements IPositionChangeObserver {
             }
         }
         return attackingEnemiesTower;
+    }
+
+    public ArrayList<Enemy> findAttackingWall(Wall wall){
+        ArrayList<Enemy> attackingEnemies = new ArrayList<>();
+        for (Map.Entry<Vector2d, LinkedList<Enemy>> entry : this.enemies.entrySet()) {
+            Vector2d position = entry.getKey();
+            boolean flag = isNextToWall(position);
+            if (flag) {
+                attackingEnemies.addAll(entry.getValue());
+            }
+        }
+        return attackingEnemies;
     }
 
     // sprawdzanie czy enemy stoi przy zamku
@@ -316,6 +331,11 @@ public class GameMap implements IPositionChangeObserver {
     // poruszanie przeciwników - jeden ruch
     public boolean buildingAt(Vector2d position) {
         if (floodMode && this.cells != null && this.cells.contains(position)) return true;
+
+        for (Wall wall: this.walls){
+            if (wall.getPosition() == position) return true;
+        }
+
         for (Tower tower : this.listOfTowers) { // sprawdzanie czy jakaś wieża tam nie stoi
             Vector2d low = tower.getLowerLeft();
             Vector2d high = tower.getUpperRight();
@@ -375,7 +395,7 @@ public class GameMap implements IPositionChangeObserver {
                 }
             }
         }
-        return -1;
+        return Integer.MAX_VALUE;
     }
 
     public IMapElement findNearestObject(Enemy enemy) {
@@ -400,7 +420,7 @@ public class GameMap implements IPositionChangeObserver {
 
     public void moveAll() {
         for (Enemy enemy : this.listOfEnemies) {
-            if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition()) && !enemy.getMadeMove()) {
+            if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition()) && !enemy.getMadeMove() && !isNextToWall(enemy.getPosition())) {
                 enemy.move();
                 enemy.changeMadeMove(true);
             }
@@ -492,4 +512,56 @@ public class GameMap implements IPositionChangeObserver {
         return this.deadEnemies;
     }
 
+    // mur
+    public void setWallStart(Vector2d start){
+        this.startWall = start;
+    }
+
+    public void addWall(Vector2d v){
+        this.newWalls.add(new Wall(100, v));
+    }
+
+    public void updateWalls() {
+        this.walls.addAll(this.newWalls);
+        ArrayList<Wall> tmp = new ArrayList<>();
+        for (Wall wall: this.walls){
+            if (wall.getHealth() <= 0) tmp.add(wall);
+        }
+        for (Wall wall: tmp){
+            this.walls.remove(wall);
+        }
+        newWalls.clear();
+    }
+
+    public boolean isNextToWall(Vector2d v){
+        for (Wall wall: this.walls){
+            int x = v.x;
+            int y = v.y;
+            int wx = wall.getPosition().x;
+            int wy = wall.getPosition().y;
+            if (x + 1 == wx && y == wy || x - 1 == wx && y == wy || x == wx && y + 1 == wy || x == wx && y -1 == wy) return true;
+        }
+        return false;
+    }
+
+    public void attackWalls() {
+        Random random = new Random();
+        int value;
+        int strength;
+        Enemy enemy;
+        if (walls.size() > 0) {
+            for (Wall wall:walls) {
+                ArrayList<Enemy> attackingEnemies = findAttackingWall(wall);
+                for (Enemy item : attackingEnemies) {
+                    enemy = item;
+                    if (!enemy.getMadeHit()) {
+                        strength = enemy.getStrength();
+                        value = random.nextInt(5 * strength);
+                        wall.subtractHealth(value);
+                        enemy.changeMadeHit(true);
+                    }
+                }
+            }
+        }
+    }
 }

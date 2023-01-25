@@ -14,6 +14,7 @@ public class Enemy implements IMapElement {
     private IMapElement destination;
     private boolean madeMove;
     private int type;
+    public double maxHealth;
 
     public Enemy(int health, int strength, Vector2d position, GameMap map, int type) {
         this.health = health;
@@ -26,6 +27,7 @@ public class Enemy implements IMapElement {
         this.destination = map.getCastle();
         this.madeMove = false;
         this.type = type;
+        this.maxHealth = health;
     }
 
     public void subtractHealth(int value) {
@@ -166,5 +168,9 @@ public class Enemy implements IMapElement {
             this.position = newPosition;
             this.nextMove += 1;
         }
+    }
+
+    public double maxHealth() {
+        return this.maxHealth;
     }
 }

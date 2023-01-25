@@ -2,6 +2,7 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.IMapElement;
 import javafx.geometry.Pos;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -13,7 +14,7 @@ public class GuiElementBox{
     private final VBox vBox;
     private final  ImageView imageView;
 
-    public GuiElementBox(IMapElement object, int size){
+    public GuiElementBox(IMapElement object){
         Image image = null;
         try {
             image = new Image(new FileInputStream(object.getPath(object)));
@@ -23,8 +24,8 @@ public class GuiElementBox{
         }
 
         imageView = new ImageView(image);
-        imageView.setFitWidth(size);
-        imageView.setFitHeight(size);
+        imageView.setFitWidth(20);
+        imageView.setFitHeight(20);
 
         vBox = new VBox();
         vBox.getChildren().addAll(imageView);
@@ -32,8 +33,5 @@ public class GuiElementBox{
     }
     public VBox getvBox()  {
         return vBox;
-    }
-    public ImageView getImageView() {
-        return this.imageView;
     }
 }

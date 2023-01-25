@@ -89,7 +89,7 @@ public class Shop {
         BorderPane.setMargin(label2, new Insets(40,0,0,0));
 
         pane3 = new BorderPane();
-        Label label3 = new Label("$100");
+        Label label3 = new Label("$50");
         label3.setStyle("-fx-background-color: #ffd11a;");
         pane3.setTop(label3);
         Image image3 = new Image(new FileInputStream("src/main/resources/wall.png"));

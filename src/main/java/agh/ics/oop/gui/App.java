@@ -47,7 +47,7 @@ public class App extends Application {
 
         BorderPane border = new BorderPane();
 
-        Label welcomeLabel = new Label("WELCOME IN TOWER DEFENCE ⚔️");
+        Label welcomeLabel = new Label("WELCOME IN TOWER DEFENCE");
         welcomeLabel.setFont(new Font("Arial", 50));
         Button start = new Button("START GAME");
         start.setFont(new Font("Arial", 40));
@@ -122,11 +122,11 @@ public class App extends Application {
         BorderPane.setMargin(label, new Insets(0,0,50,0));
         border.setBottom(label);
 
-        Label chooseLabel = new Label("Choose a map \uD83D\uDDFA");
+        Label chooseLabel = new Label("Choose a map");
         chooseLabel.setFont(new Font("Arial", 50));
 
-        Button m1 = new Button("BASIC \uD83C\uDFF0");
-        Button m2 = new Button("FLOOD \uD83C\uDF0A");
+        Button m1 = new Button("BASIC");
+        Button m2 = new Button("FLOOD");
         Button m3 = new Button("EXTENDED");
         m1.setFont(new Font("Arial", 20));
         m2.setFont(new Font("Arial", 20));

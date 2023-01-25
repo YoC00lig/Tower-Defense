@@ -285,7 +285,7 @@ public class App extends Application {
         }
         for (LinkedList<Enemy> list: map1.enemies.values()){
             for (Enemy element: list){
-                GuiElementBox guiElement = new GuiElementBox(element, 20);
+                GuiElementBox guiElement = new GuiElementBox(element);
                 VBox elem = guiElement.getvBox();
                 Vector2d pos = element.getPosition();
                 gridPane.add(elem,  pos.x - low.x + 1, high.y - pos.y + 1);
@@ -294,7 +294,7 @@ public class App extends Application {
         }
 
         for (Wall element : map1.walls){
-            GuiElementBox guiElement = new GuiElementBox(element, 20);
+            GuiElementBox guiElement = new GuiElementBox(element);
             VBox elem = guiElement.getvBox();
             Vector2d pos = element.getPosition();
             gridPane.add(elem,  pos.x - low.x + 1, high.y - pos.y + 1);
@@ -317,7 +317,7 @@ public class App extends Application {
             view.setFitHeight(50);
             view.setFitWidth(60);
 
-            double progress = tower.getHealth() / tower.maxHealth;
+            double progress = tower.getHealth() / tower.maxHealth();
             ProgressBar HB = new ProgressBar(Math.min(1.00, progress));
             if (progress > 0.8) HB.setStyle("-fx-accent: green;");
             else if (progress >= 0.6 && progress < 0.8) HB.setStyle("-fx-accent: #ccff33;");
@@ -351,7 +351,7 @@ public class App extends Application {
         view.setFitWidth(200);
         view.setFitHeight(180);
 
-        double progress = castle.getHealth() / castle.maxHealth;
+        double progress = castle.getHealth() / castle.maxHealth();
         ProgressBar castleHB = new ProgressBar(Math.min(1.00, progress));
         if (progress > 0.8) castleHB.setStyle("-fx-accent: green;");
         else if (progress >= 0.6 && progress < 0.8) castleHB.setStyle("-fx-accent: #ccff33;");
@@ -440,14 +440,15 @@ public class App extends Application {
         Vector2d start = map1.startWall;
         Vector2d end = new Vector2d(row, col);
         ArrayList<Vector2d> walls = BFS(start, end);
+        Wall wall = new Wall(100, new Vector2d(0,0));
         for (Vector2d v: walls){
-            if (map1.money - 100 >= 0){
+            if (map1.money - wall.getPrice() >= 0){
                 map1.addWall(v);
-                map1.money -= 100;
+                map1.money -= wall.getPrice();
             }
         }
         for (Wall element: map1.newWalls){
-            GuiElementBox guiElement = new GuiElementBox(element, 20);
+            GuiElementBox guiElement = new GuiElementBox(element);
             VBox elem = guiElement.getvBox();
             Vector2d pos = element.getPosition();
             this.gridPane.add(elem,  pos.x - low.x + 1, high.y - pos.y + 1);

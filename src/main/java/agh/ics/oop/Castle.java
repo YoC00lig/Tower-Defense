@@ -51,4 +51,8 @@ public class Castle implements IMapElement{
     public void heal(){
         this.health = (int) maxHealth;
     }
+
+    public double maxHealth() {
+        return this.maxHealth;
+    }
 }

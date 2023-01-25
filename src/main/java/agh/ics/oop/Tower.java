@@ -78,4 +78,8 @@ public class Tower implements IMapElement{
     public Vector2d getPosition() {
         return this.getUpperLeft();
     }
+
+    public double maxHealth() {
+        return this.maxHealth;
+    }
 }

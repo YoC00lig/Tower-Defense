@@ -5,10 +5,12 @@ import java.util.*;
 public class Wall implements IMapElement{
     Vector2d position;
     private int health;
+    public double maxHealth;
 
     public Wall(int health, Vector2d position){
         this.health = health;
         this.position = position;
+        this.maxHealth = health;
     }
 
     public int getHealth(){
@@ -30,5 +32,8 @@ public class Wall implements IMapElement{
     }
     public int getPrice() {
         return 100;
+    }
+    public double maxHealth() {
+        return this.maxHealth;
     }
 }

@@ -22,17 +22,21 @@ public class GameOver {
     private GridPane gridPane = new GridPane();
     private GameMap map;
     private App application;
-
+    private String string;
     private Stage stage;
 
 
-    public GameOver(Stage stage, GameMap map, Stage primaryStage, App application) {
+    public GameOver(Stage stage, GameMap map, Stage primaryStage, App application, String string) {
         this.map = map;
         this.stage = stage;
         this.stage.setAlwaysOnTop(true);
         this.stage.initModality(Modality.APPLICATION_MODAL);
         this.stage.initOwner(primaryStage);
         this.application = application;
+        this.string = string;
+        stage.setOnCloseRequest(event -> {
+                    Platform.exit();
+        });
         create();
 
     }
@@ -40,7 +44,8 @@ public class GameOver {
     private void create() {
         gridPane.getChildren().clear();
         gridPane = new GridPane();
-        Label gameOver = new Label("GAME OVER");
+
+        Label gameOver = new Label(this.string);
         HBox gameOverBox = new HBox(gameOver);
         gameOverBox.setAlignment(Pos.CENTER);
         gameOver.setFont(new Font("Arial", 40));
@@ -56,7 +61,6 @@ public class GameOver {
         styleButtonHover(playAgain);
         playAgain.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 2em; ");
         playAgain.setFont(new Font("Arial", 20));
-
         Button quit = new Button("QUIT GAME");
         quit.setOnMouseClicked(event -> {
             Platform.exit();
@@ -71,7 +75,7 @@ public class GameOver {
 
         Label castleHealth = new Label("CASTLE HEALTH:");
         castleHealth.setFont(new Font("Arial", 20));
-        Label waveNumber = new Label("ENEMY WAVE NUMBER:");
+        Label waveNumber = new Label("ENEMY WAVE:");
         waveNumber.setFont(new Font("Arial", 20));
         Label enemies1 = new Label("NUMBER OF TYPE 1 ENEMIES DEFEATED:");
         enemies1.setFont(new Font("Arial", 20));
@@ -79,12 +83,12 @@ public class GameOver {
         enemies2.setFont(new Font("Arial", 20));
         Label enemies3 = new Label("NUMBER OF TYPE 3 ENEMIES DEFEATED:");
         enemies3.setFont(new Font("Arial", 20));
-        Label money = new Label("MONEY:");
+        Label money = new Label("MONEY LEFT:");
         money.setFont(new Font("Arial", 20));
         int health = Math.max(0, this.map.getCastle().getHealth());
         Label castleHealthValue = new Label("" + health);
         castleHealthValue.setFont(new Font("Arial", 20));
-        Label waveNumberValue = new Label("" + (this.map.getWaveIndex() + 1));
+        Label waveNumberValue = new Label("" + this.map.getWaveIndex());
         waveNumberValue.setFont(new Font("Arial", 20));
         Label enemies1Value = new Label("" + this.map.getDeadEnemies()[0]);
         enemies1Value.setFont(new Font("Arial", 20));

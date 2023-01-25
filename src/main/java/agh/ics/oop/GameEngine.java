@@ -45,7 +45,7 @@ public class GameEngine implements Runnable, IEngine{
         while (true) {
             updateMap();
             if(this.map.getCastle().getHealth()<=0){
-                app.loose = true;
+                app.lose = true;
                 try {
                     app.draw();
                 } catch (FileNotFoundException e) {
@@ -57,6 +57,13 @@ public class GameEngine implements Runnable, IEngine{
             }
             if(this.map.listOfEnemies.size()==0){
                 app.win = true;
+                try {
+                    app.draw();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    System.exit(0);
+                    throw new RuntimeException(e);
+                }
                 break;
             }
             try {

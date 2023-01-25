@@ -33,7 +33,7 @@ public class App extends Application {
     VBox box;
     Thread thread;
     Button play = drawButton();
-    public boolean loose = false;
+    public boolean lose = false;
     public boolean win = false;
 
     public static void main(String[] args) {
@@ -113,7 +113,7 @@ public class App extends Application {
         gridPane = new GridPane();
 
         play = drawButton();
-        loose = false;
+        lose = false;
         win = false;
 
         BorderPane border = new BorderPane();
@@ -399,10 +399,10 @@ public class App extends Application {
         stageShop.show();
     }
 
-    public void drawGameOver(){
+    public void drawGameOver(String string){
         Stage gameOverStage = new Stage();
         gameOverStage.setTitle("Game Over");
-        GameOver gameOver = new GameOver(gameOverStage, map1, stage,this);
+        GameOver gameOver = new GameOver(gameOverStage, map1, stage,this, string);
         Scene stats = new Scene(gameOver.getGP(), 700, 500);
         gameOverStage.setResizable(false);
         gameOverStage.setScene(stats);
@@ -423,11 +423,14 @@ public class App extends Application {
     public void draw() throws FileNotFoundException {
         Platform.runLater(() -> {
             try {
-                if(!loose && !win) {
+                if(!lose) {
                     drawMap();
                 }
-                if(loose){
-                    drawGameOver();
+                if(lose){
+                    drawGameOver("YOU LOSE");
+                }
+                if(win){
+                    drawGameOver("VICTORY!");
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

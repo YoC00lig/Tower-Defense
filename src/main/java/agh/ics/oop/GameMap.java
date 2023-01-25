@@ -1,5 +1,6 @@
 package agh.ics.oop;
 
+import java.awt.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -366,12 +367,12 @@ public class GameMap implements IPositionChangeObserver {
         LinkedList<Vector2d> queue = new LinkedList<>();
         visited[s.x][s.y] = true;
         queue.add(s);
-        dist[s.x][s.y] = 1;
+        dist[s.x][s.y] = 0;
         Vector2d p;
 
         while (queue.size() != 0) {
             p = queue.poll();
-            if (p.equals(destination)) return dist[p.x][p.y];
+            if (p.x == destination.x && p.y == destination.y) return dist[p.x][p.y];
             ArrayList<Vector2d> next_vectors = new ArrayList<>();
             int x = p.x;
             int y = p.y;
@@ -398,22 +399,51 @@ public class GameMap implements IPositionChangeObserver {
         return Integer.MAX_VALUE;
     }
 
-    public IMapElement findNearestObject(Enemy enemy) {
-        IMapElement object = null;
-        Vector2d position = enemy.getPosition();
+    public int shortestDist(Vector2d start, int startX, int endX, int startY, int endY) {
         int dist = Integer.MAX_VALUE;
+        if (startX - 1 >= 0){
+            for (int col = startY; col <= endY; col ++){
+                int newDist = BFS(start, new Vector2d(startX-1,col));
+                if (newDist < dist) dist = newDist;
+            }
+        }
+        if (endX + 1 <= this.lowerRight.x){
+            for (int col = startY; col <= endY; col ++){
+                int newDist = BFS(start, new Vector2d(startX+1,col));
+                if (newDist < dist) dist = newDist;
+            }
+        }
+        if (startY - 1 >= 0){
+            for (int row = startX; row <= endX; row++){
+                int newDist = BFS(start, new Vector2d(row, startY - 1));
+                if (newDist < dist) dist = newDist;
+            }
+        }
+        if (startY + 1 <= this.upperLeft.y){
+            for (int row = startX; row <= endX; row++){
+                int newDist = BFS(start, new Vector2d(row, startY + 1));
+                if (newDist < dist) dist = newDist;
+            }
+        }
+        return dist;
+    }
+
+
+    public IMapElement findNearestObject(Enemy enemy) {
+        IMapElement object = this.castle;
+        Vector2d lowC = this.castle.getLowerLeft();
+        Vector2d highC = this.castle.getUpperRight();
+        Vector2d position = enemy.getPosition();
+        int dist = shortestDist(position, lowC.x, highC.x, lowC.y, highC.y);
         int tmp;
         for (Tower tower : this.listOfTowers) {
-            tmp = Math.min(BFS(position, tower.getUpperLeft()), BFS(position, tower.getLowerLeft()));
-            tmp = Math.min(tmp, BFS(position, tower.getUpperRight()));
-            tmp = Math.min(tmp, BFS(position, tower.getLowerRight()));
+            Vector2d low = tower.getLowerLeft();
+            Vector2d high = tower.getUpperRight();
+            tmp = shortestDist(position, low.x, high.x, low.y, high.y);
             if (tmp < dist) {
                 dist = tmp;
                 object = tower;
             }
-        }
-        if (enemy.BFS(position).size() < dist) {
-            object = castle;
         }
         return object;
     }

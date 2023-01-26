@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.*;
 
 public class Shop {
@@ -212,8 +213,9 @@ public class Shop {
         BorderPane.setAlignment(btn2, Pos.CENTER);
         BorderPane.setMargin(btn2, new Insets(0,0,40,0));
         BorderPane.setMargin(label2, new Insets(40,0,0,0));
-        styleButtonHover(btn2);
 
+        styleButtonHover(btn2);
+        btn2.setStyle("-fx-background-color: #de8c81;" + "-fx-background-radius: 1em; ");
         btn2.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             map.sellTower(tower);
             stage.close();
@@ -277,6 +279,8 @@ public class Shop {
     public void styleButtonHover(Button B) {
         B.addEventHandler(MouseEvent.MOUSE_ENTERED, e -> B.setEffect(new DropShadow()));
         B.addEventHandler(MouseEvent.MOUSE_EXITED, e -> B.setEffect(null));
+        B.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1em; ");
+        B.setFont(new Font("Arial", 14));
     }
 
 }

@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -35,6 +36,9 @@ public class App extends Application {
     Button play = drawButton();
     public boolean lose = false;
     public boolean win = false;
+    String nick;
+    TextField text;
+    Label label;
 
     public static void main(String[] args) {
         launch(args);
@@ -118,12 +122,15 @@ public class App extends Application {
 
         BorderPane border = new BorderPane();
         Label label = new Label();
+        label.setMinHeight(100);
         label.setFont(new Font("Arial", 20));
         BorderPane.setMargin(label, new Insets(0,0,50,0));
         border.setBottom(label);
 
         Label chooseLabel = new Label("Choose a map");
         chooseLabel.setFont(new Font("Arial", 50));
+        Label nickLabel = new Label("Enter your nickname");
+        nickLabel.setFont(new Font("Arial", 50));
 
         Button m1 = new Button("BASIC");
         Button m2 = new Button("FLOOD");
@@ -140,42 +147,73 @@ public class App extends Application {
         m3.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 1.5em; ");
 
         m1.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1000, 1, false, false);
-            engine = new GameEngine(this.map1, this);
-            thread = new Thread(engine);
-            try {
-                drawMap();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+            nick = text.getText();
+            if (!(nick.length() == 0)) {
+                this.map1 = new GameMap(new Vector2d(69, 0), new Vector2d(0, 39), 1000, 1, false, false);
+                engine = new GameEngine(this.map1, this);
+                thread = new Thread(engine);
+                try {
+                    drawMap();
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else{
+                VBox info = Information(4);
+                border.setBottom(info);
+                BorderPane.setAlignment(info, Pos.CENTER);
             }
         });
 
         m2.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1500, 2, true, false);
-            floodMode = true;
-            engine = new GameEngine(this.map1, this);
-            thread = new Thread(engine);
-            try {
-                drawMap();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+            nick = text.getText();
+            if (!(nick.length() == 0)) {
+                this.map1 = new GameMap(new Vector2d(69, 0), new Vector2d(0, 39), 1500, 2, true, false);
+                floodMode = true;
+                engine = new GameEngine(this.map1, this);
+                thread = new Thread(engine);
+                try {
+                    drawMap();
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else{
+                VBox info = Information(4);
+                border.setBottom(info);
+                BorderPane.setAlignment(info, Pos.CENTER);
             }
         });
 
         m3.setOnMouseClicked(event -> {
-            this.map1 = new GameMap(new Vector2d(69,0),new Vector2d(0,39), 1500, 2, false, true);
-            floodMode = true;
-            engine = new GameEngine(this.map1, this);
-            thread = new Thread(engine);
-            try {
-                drawMap();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+            nick = text.getText();
+            if (!(nick.length() == 0)) {
+                this.map1 = new GameMap(new Vector2d(69, 0), new Vector2d(0, 39), 1500, 2, false, true);
+                engine = new GameEngine(this.map1, this);
+                thread = new Thread(engine);
+                try {
+                    drawMap();
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            else{
+                VBox info = Information(4);
+                border.setBottom(info);
+                BorderPane.setAlignment(info, Pos.CENTER);
             }
         });
 
+        text = new TextField();
+        text.setPromptText("Your nickname");
+        text.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 2em; ");
+        text.setFont(new Font("Arial", 20));
+        text.setAlignment(Pos.CENTER);
         HBox hBox = new HBox(40, m1, m2, m3);
         hBox.setAlignment(Pos.CENTER);
+        text.setMaxWidth(300);
+        text.setMinHeight(50);
+
 
         m1.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
             VBox info = Information(1);
@@ -197,7 +235,7 @@ public class App extends Application {
         m2.addEventHandler(MouseEvent.MOUSE_EXITED, event -> border.setBottom(label));
         m3.addEventHandler(MouseEvent.MOUSE_EXITED, event -> border.setBottom(label));
 
-        VBox vB = new VBox(100, chooseLabel, hBox);
+        VBox vB = new VBox(100, nickLabel, text, chooseLabel, hBox);
         vB.setAlignment(Pos.CENTER);
 
         border.setCenter(vB);
@@ -212,15 +250,17 @@ public class App extends Application {
     }
 
     public VBox Information(int option){
-        Label label;
         if (option == 1) label = new Label("Basic version, two types of towers to buy");
         else if (option == 2) label = new Label("Inaccessible to enemies places on the map that have been flooded");
-        else label = new Label("Premium version, you can buy health for castle, improve towers range and sell towers");
+        else if (option == 3) label = new Label("Premium version, you can buy health for castle, improve towers range and sell towers");
+        else label = new Label("You must enter your nickname first");
         label.setFont(new Font("Arial", 20));
         VBox box = new VBox(label);
-        box.setStyle("-fx-background-color: #ffdd99;");
+        if ( option != 4 ) box.setStyle("-fx-background-color: #ffdd99;" + "-fx-background-radius: 3em; ");
+        else box.setStyle("-fx-background-color: #f28061;" + "-fx-background-radius: 3em; " + "-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 30, 0, 0, 0)");
         box.setAlignment(Pos.CENTER);
         box.setMaxWidth(800);
+        box.setMinHeight(100);
         BorderPane.setMargin(box, new Insets(0,0,50,0));
         return box;
     }
@@ -246,7 +286,7 @@ public class App extends Application {
         int size = 20;
         gridPane.getChildren().clear();
         gridPane = new GridPane();
-        Label label = new Label("y/x");
+        Label label = new Label();
 
         Vector2d low = new Vector2d(map1.upperLeft.x, map1.lowerRight.y);
         Vector2d high = new Vector2d(map1.lowerRight.x, map1.upperLeft.y);
@@ -259,7 +299,7 @@ public class App extends Application {
 
         // dodawanie wrogów, wież etc do gridpane
         for (int i = low.x; i <= high.x; i++){
-            Label numberX = new Label("" + i );
+            Label numberX = new Label();
             VBox box = new VBox(numberX);
             gridPane.add(box,  i - low.x + 1, 0);
             gridPane.getColumnConstraints().add(new ColumnConstraints(size));
@@ -269,7 +309,7 @@ public class App extends Application {
         }
 
         for (int i = low.y; i <= high.y; i++){
-            Label numberY = new Label("" + i);
+            Label numberY = new Label();
             VBox box = new VBox(numberY);
             gridPane.add(box, 0,high.y - i + 1);
             gridPane.getRowConstraints().add(new RowConstraints(size));
@@ -418,6 +458,7 @@ public class App extends Application {
         gameOverStage.setTitle("Game Over");
         GameOver gameOver = new GameOver(gameOverStage, map1, stage,this, string);
         Scene stats = new Scene(gameOver.getGP(), 700, 500);
+        gameOver.setScene(stats);
         gameOverStage.setResizable(false);
         gameOverStage.setScene(stats);
         gameOverStage.show();

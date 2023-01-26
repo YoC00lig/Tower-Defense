@@ -33,6 +33,7 @@ public class GameMap implements IPositionChangeObserver {
     public ArrayList<Wall> walls = new ArrayList<>();
     public boolean extendedMode;
     public Vector2d startWall=null;
+    private int score = 0;
 
 
     public GameMap(Vector2d lowerRight, Vector2d upperLeft, int InitMoney, int mapVariant, boolean flood, boolean extended) {
@@ -203,6 +204,7 @@ public class GameMap implements IPositionChangeObserver {
                 strength = tower.getStrength();
                 value = random.nextInt(5 * strength);
                 nearestEnemy.subtractHealth(value);
+                score += 10;
             }
         }
     }
@@ -216,10 +218,13 @@ public class GameMap implements IPositionChangeObserver {
                 this.deadEnemies[enemy.getType()] += 1;
                 if (enemy.getType() == 0) {
                     money += 50;
+                    score += 50;
                 } else if (enemy.getType() == 1) {
                     money += 70;
+                    score += 70;
                 } else if (enemy.getType() == 2) {
                     money += 100;
+                    score += 100;
                 }
             }
         }
@@ -237,6 +242,7 @@ public class GameMap implements IPositionChangeObserver {
         for (Tower tower : listOfTowers) {
             if (tower.getHealth() <= 0) {
                 tmp.add(tower);
+                score -= 50;
             }
         }
         for (Tower tower : tmp) {
@@ -491,6 +497,9 @@ public class GameMap implements IPositionChangeObserver {
                 flag = flag && !buildingAt(tower.getUpperLeft().add(new Vector2d(i, j)));
             }
         }
+        Vector2d low = tower.getLowerLeft();
+        Vector2d high = tower.getUpperRight();
+        flag = low.y >= this.lowerRight.y && high.y <= this.upperLeft.y && low.x >= this.upperLeft.x && high.x <= this.lowerRight.x;
         return flag;
     }
 
@@ -499,6 +508,7 @@ public class GameMap implements IPositionChangeObserver {
             for (Tower tower : this.newTowers) {
                 towers.put(tower.getUpperLeft(), tower);
                 listOfTowers.add(tower);
+                score += 70;
             }
             this.newTowers.clear();
         }
@@ -527,6 +537,7 @@ public class GameMap implements IPositionChangeObserver {
                 listOfTowers.remove(tower);
                 towers.remove(tower.getUpperLeft());
                 this.increaseMoney(tower.getCurrentPriceToSell());
+                score += tower.getCurrentPriceToSell();
             }
         }
         this.soldTowers.clear();
@@ -559,6 +570,7 @@ public class GameMap implements IPositionChangeObserver {
         if (this.newWalls.size() > 0){
             this.walls.addAll(this.newWalls);
             newWalls.clear();
+            score += 3;
         }
     }
 
@@ -599,5 +611,10 @@ public class GameMap implements IPositionChangeObserver {
                 }
             }
         }
+    }
+
+    public int getScore() {
+        this.score += money;
+        return this.score;
     }
 }

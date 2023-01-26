@@ -171,7 +171,7 @@ public class GameMap implements IPositionChangeObserver {
         ArrayList<Enemy> attackingEnemies = new ArrayList<>();
         for (Map.Entry<Vector2d, LinkedList<Enemy>> entry : this.enemies.entrySet()) {
             Vector2d position = entry.getKey();
-            boolean flag = isNextToWall(position);
+            boolean flag = isNextToWall(position, wall);
             if (flag) {
                 attackingEnemies.addAll(entry.getValue());
             }
@@ -450,7 +450,11 @@ public class GameMap implements IPositionChangeObserver {
 
     public void moveAll() {
         for (Enemy enemy : this.listOfEnemies) {
-            if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition()) && !enemy.getMadeMove() && !isNextToWall(enemy.getPosition())) {
+            boolean flag = false;
+            for (Wall wall: this.walls){
+                if (isNextToWall(enemy.getPosition(), wall)) flag = true;
+            }
+            if (!isNextToCastle(enemy.getPosition()) && !isNextToTower(enemy.getPosition()) && !enemy.getMadeMove() && !flag) {
                 enemy.move();
                 enemy.changeMadeMove(true);
             }
@@ -548,11 +552,17 @@ public class GameMap implements IPositionChangeObserver {
     }
 
     public void addWall(Vector2d v){
-        this.newWalls.add(new Wall(100, v));
+        this.newWalls.add(new Wall(25, v));
     }
 
-    public void updateWalls() {
-        this.walls.addAll(this.newWalls);
+    public void addWalls() {
+        if (this.newWalls.size() > 0){
+            this.walls.addAll(this.newWalls);
+            newWalls.clear();
+        }
+    }
+
+    public void removeWalls() {
         ArrayList<Wall> tmp = new ArrayList<>();
         for (Wall wall: this.walls){
             if (wall.getHealth() <= 0) tmp.add(wall);
@@ -560,18 +570,14 @@ public class GameMap implements IPositionChangeObserver {
         for (Wall wall: tmp){
             this.walls.remove(wall);
         }
-        newWalls.clear();
     }
 
-    public boolean isNextToWall(Vector2d v){
-        for (Wall wall: this.walls){
-            int x = v.x;
-            int y = v.y;
-            int wx = wall.getPosition().x;
-            int wy = wall.getPosition().y;
-            if (x + 1 == wx && y == wy || x - 1 == wx && y == wy || x == wx && y + 1 == wy || x == wx && y -1 == wy) return true;
-        }
-        return false;
+    public boolean isNextToWall(Vector2d v, Wall wall){
+        int x = v.x;
+        int y = v.y;
+        int wx = wall.getPosition().x;
+        int wy = wall.getPosition().y;
+        return (x + 1 == wx && y == wy) || (x - 1 == wx && y == wy) || (x == wx && y + 1 == wy) || (x == wx && y - 1 == wy);
     }
 
     public void attackWalls() {

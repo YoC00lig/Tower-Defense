@@ -24,7 +24,7 @@ public class GameEngine implements Runnable, IEngine{
     public void updateMap(){
         map.sellTowers();
         map.addTowers();
-        map.updateWalls();
+        map.addWalls();
         map.moveAll();   // ruch wrogów
         map.attackCastle();  // atak wrogów na zamek
         map.attackTowers();  // atak wrogów na wieże
@@ -32,6 +32,7 @@ public class GameEngine implements Runnable, IEngine{
         map.deleteDeadTowers();   // usunięcie zniszczonych wież
         map.shotFromTowers();     // atak wież na wrogów
         map.deleteDeadEnemies();  // usunięcie martwych wrogów
+        map.removeWalls();
         map.removeHits();    // reset informacji o tym czy wróg zaatakował
         map.removeMoves();
         map.enemiesWave();   // wygenerowanie fali wrogów

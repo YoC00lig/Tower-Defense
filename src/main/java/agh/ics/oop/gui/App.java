@@ -439,9 +439,9 @@ public class App extends Application {
         Vector2d high = new Vector2d(map1.lowerRight.x, map1.upperLeft.y);
         Vector2d start = map1.startWall;
         Vector2d end = new Vector2d(row, col);
-        ArrayList<Vector2d> walls = BFS(start, end);
+        ArrayList<Vector2d> walls2 = BFS(start, end);
         Wall wall = new Wall(100, new Vector2d(0,0));
-        for (Vector2d v: walls){
+        for (Vector2d v: walls2){
             if (map1.money - wall.getPrice() >= 0){
                 map1.addWall(v);
                 map1.money -= wall.getPrice();
@@ -476,6 +476,11 @@ public class App extends Application {
     }
 
     public ArrayList<Vector2d> BFS(Vector2d s, Vector2d e) {
+        if (s.equals(e)) {
+            ArrayList<Vector2d> result = new ArrayList<>();
+            result.add(s);
+            return result;
+        }
         boolean[][] visited = new boolean[70][40];
         Map<Vector2d, Vector2d> parents = new HashMap<>();
         LinkedList<Vector2d> queue = new LinkedList<>();

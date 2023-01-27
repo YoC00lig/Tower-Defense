@@ -33,3 +33,21 @@ bar, and when it is empty, the game is over. You can recharge his health bar to 
 <img src="/readme/input.gif">
 
 <h1>❓ How to place objects? </h1>
+<h3> Tower </h3>
+<p> It's easy. You have to click anywhere on the map (it will be the upper left corner of the tower). Then the shop window will be displayed. Click the BUY button under the selected tower. If you do not have enough money, you will see the appropriate message.</p>
+<h3> Wall </h3>
+<p> It's a little more complicated. You also need to click anywhere on the map - this will be the beginning of the wall. In the shop window, select the wall and click BUY. When the shop window disappears, click anywhere on the map again - this time it will be the end of the wall. When you don't have enough money, only part of the wall will be built.</p>
+
+<h3> First objects </h3>
+
+<p> At the beginning, you have a certain amount of money to spend. Place your first objects, then press the PLAY button to start the game. Remember that objects cannot overlap and cannot extend beyond map bounds. </p>
+
+<img src="/readme/shop.gif">
+
+<h1> ⬆️ Upgrade objects </h1>
+<p> You can upgrade your objects during the game. To do this, click on the object you want to improve. </p>
+<img src="/readme/upgrade.gif">
+
+<h1> 🏁 End of the game </h1>
+<p> The game ends when the castle is destroyed or the player defeats all waves of enemies. At the end of the game, a window with information and statistics is displayed. You can see your score and top three scores in the game, quit game or play again.</p>
+<img src="/readme/end.gif">

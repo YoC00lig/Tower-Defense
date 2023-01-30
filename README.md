@@ -12,7 +12,7 @@ can go through it. This gives you extra time to think about your game strategy.<
 of enemy. Enemies are a bit lazy - they always look for the nearest object and choose the shortest path to it.</p>
 
 <p> The castle is the most important object in the game. It stands in the center of the map and is the target of enemy attacks. The castle has a health
-bar, and when it is empty, the game is over. You can recharge his health bar to the maximum at any time - but it's not cheap.</p>
+bar, and when it is empty, the game is over. You can recharge its health bar to the maximum at any time - but it's not cheap.</p>
 
 <h2> 🗺 You can choose different variants of the map: </h2>
 <p> ⚙️ Basic - you can only place towers and walls. </p>

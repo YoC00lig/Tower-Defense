@@ -1,4 +1,4 @@
-<h1> ⭐️ Tower defence ⭐️ </h1>
+<h1> ⭐️ Tower defense ⭐️ </h1>
 <p> A simple game whose goal is to defend the castle from the incoming waves of enemies. The player can defend the castle by placing towers that deal damage to enemies and building walls that temporarily distract the
 enemy from the target (castle). Unfortunately, enemies can destroy any object.</p>
 

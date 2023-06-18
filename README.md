@@ -24,6 +24,7 @@ bar, and when it is empty, the game is over. You can recharge its health bar to 
 <li> Java 17 </li>
 <li> Gradle </li>
 <li> JavaFX </li>
+<li> The icons have been sourced from <a href="https://www.flaticon.com">here</a>. </li>
 </ul>
 
 <h1> 🎮 Let's begin! </h1>
